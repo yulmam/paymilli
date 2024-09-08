@@ -2,12 +2,15 @@ package com.paymilli.paymilli.domain.card.controller;
 
 
 import com.paymilli.paymilli.domain.card.dto.request.AddCardRequest;
+import com.paymilli.paymilli.domain.card.dto.request.DeleteCardRequest;
+import com.paymilli.paymilli.domain.card.dto.response.CardResponse;
 import com.paymilli.paymilli.domain.card.service.CardService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -36,13 +39,16 @@ public class CardController {
 
 
     @GetMapping
-    public ResponseEntity<?> searchCards(HttpServletRequest request){
+    public ResponseEntity<List<CardResponse>> searchCards(HttpServletRequest request){
         //userId 수정 필요
+        UUID userId = null;
         return new ResponseEntity<>(cardService.searchCards(userId), HttpStatus.OK);
     }
 
     @DeleteMapping
     public ResponseEntity<?> deleteCard(@RequestBody DeleteCardRequest deleteCardRequest, HttpServletRequest request){
-        return new ResponseEntity<>(cardService.deleteCard(deleteCardRequest.getID()), userId());
+        //userId 수정 필요
+        UUID userId = null;
+        return new ResponseEntity<>(cardService.deleteCard(deleteCardRequest.getID()), userId);
     }
 }
