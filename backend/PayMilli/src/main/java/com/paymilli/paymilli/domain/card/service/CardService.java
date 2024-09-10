@@ -7,13 +7,11 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CardService {
-    public boolean isAlreadyRegister(String cardNumber, UUID userId);
+    boolean isAlreadyRegister(String cardNumber, UUID userId);
 
-    public void checkValidation(AddCardRequest addCardRequest);
+    void registerCard(AddCardRequest addCardRequest, UUID userId);
 
-    public void registerCard(AddCardRequest addCardRequest, UUID userId);
+    List<CardResponse> searchCards(UUID userId);
 
-    public List<CardResponse> searchCards(UUID userId);
-
-    public void deleteCard(UUID cardId, UUID userId);
+    void deleteCard(UUID cardId, UUID userId);
 }

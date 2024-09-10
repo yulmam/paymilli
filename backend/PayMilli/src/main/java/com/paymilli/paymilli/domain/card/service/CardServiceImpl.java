@@ -1,47 +1,61 @@
 package com.paymilli.paymilli.domain.card.service;
 
+import com.paymilli.paymilli.domain.card.client.CardClient;
 import com.paymilli.paymilli.domain.card.dto.request.AddCardRequest;
+import com.paymilli.paymilli.domain.card.dto.response.CardInfoResponse;
 import com.paymilli.paymilli.domain.card.dto.response.CardResponse;
+import com.paymilli.paymilli.domain.card.entity.Card;
+import com.paymilli.paymilli.domain.card.repository.CardRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 public class CardServiceImpl implements CardService{
-    private final WebClient webClient;
+
+    private final CardClient cardClient;
 
     private final CardRepository cardRepository;
+    //user 완성 시 추가
+    //private final UserRepository userRepository;
 
-    public CardServiceImpl(WebClient webClient, CardRepository cardRepository){
-        this.webClient  = webClient;
+    public CardServiceImpl(CardClient cardClient, CardRepository cardRepository){ // UserRepository userRepository
+        this.cardClient = cardClient;
         this.cardRepository = cardRepository;
+        //this.userRepository = userRepository;
     }
 
-
-    @Override
+    @Transactional
     public boolean isAlreadyRegister(String cardNumber, UUID userId) {
-        return false;
+        return cardRepository.findByCardNumberAndUserId(cardNumber, userId).isPresent();
     }
 
-    @Override
-    public void checkValidation(AddCardRequest addCardRequest) {
-
-    }
-
-    @Override
+    @Transactional
     public void registerCard(AddCardRequest addCardRequest, UUID userId) {
-
+        if(isAlreadyRegister(addCardRequest.getCardNumber(), userId))
+            throw new IllegalArgumentException();
+        CardInfoResponse cardInfoResponse = cardClient.validateAndGetCardInfo(addCardRequest, userId);
+        cardRepository.save(
+                Card.toEntity(
+                    addCardRequest,
+                    cardInfoResponse//,
+                    //userRepository.getReferenceByUserId(userId)
+                )
+        );
     }
 
-    @Override
+    @Transactional
     public List<CardResponse> searchCards(UUID userId) {
-        return List.of();
+        return cardRepository.findByUserId(userId).stream()
+                .map(Card::makeResponse)
+                .collect(Collectors.toList());
     }
 
-    @Override
+    @Transactional
     public void deleteCard(UUID cardId, UUID userId) {
-
+        cardRepository.deleteByIdAndUserId(cardId, userId);
     }
 }

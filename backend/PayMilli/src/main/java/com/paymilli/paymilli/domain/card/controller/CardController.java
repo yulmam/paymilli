@@ -49,6 +49,7 @@ public class CardController {
     public ResponseEntity<?> deleteCard(@RequestBody DeleteCardRequest deleteCardRequest, HttpServletRequest request){
         //userId 수정 필요
         UUID userId = null;
-        return new ResponseEntity<>(cardService.deleteCard(deleteCardRequest.getID()), userId);
+        cardService.deleteCard(deleteCardRequest.getCardId(), userId);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }
