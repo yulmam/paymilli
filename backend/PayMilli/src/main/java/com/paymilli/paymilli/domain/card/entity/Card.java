@@ -73,7 +73,7 @@ public class Card {
         return Card.builder()
                 .cardNumber(addCardRequest.getCardNumber())
                 .CVC(addCardRequest.getCvc())
-                .expiration_date(addCardRequest.getExpirationDate())
+                .expirationDate(addCardRequest.getExpirationDate())
                 .cardHolderName(addCardRequest.getCardHolderName())
                 .cardImage(cardInfoResponse.getCardImage())
                 .cardName(cardInfoResponse.getCardName())
