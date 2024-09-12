@@ -42,7 +42,7 @@ public class Card {
     private String CVC;
 
     @Column(nullable = false)
-    private String expiration_date;
+    private String expirationDate;
 
     @Column(nullable = false)
     private String cardName;
@@ -50,7 +50,7 @@ public class Card {
     @Column(nullable = false)
     private String cardHolderName;
 
-    @Column
+    @Column(nullable = false)
     private String cardImage;
 
     @Column(nullable = false)

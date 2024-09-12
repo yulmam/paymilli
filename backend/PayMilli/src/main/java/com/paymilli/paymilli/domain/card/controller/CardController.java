@@ -27,11 +27,6 @@ public class CardController {
         //userId 수정 필요
         UUID userId = null;
 
-        if(!cardService.isAlreadyRegister(addCardRequest.getCardNumber(), userId))
-            return new ResponseEntity<>("이미 등록된 카드입니다.", HttpStatus.BAD_REQUEST);
-
-        cardService.checkValidation(addCardRequest);
-
         cardService.registerCard(addCardRequest, userId);
 
         return new ResponseEntity<>("정상적으로 등록되었습니다.", HttpStatus.OK);

@@ -37,11 +37,11 @@ public class CardServiceImpl implements CardService{
     public void registerCard(AddCardRequest addCardRequest, UUID userId) {
         if(isAlreadyRegister(addCardRequest.getCardNumber(), userId))
             throw new IllegalArgumentException();
-        CardInfoResponse cardInfoResponse = cardClient.validateAndGetCardInfo(addCardRequest, userId);
+
         cardRepository.save(
                 Card.toEntity(
                     addCardRequest,
-                    cardInfoResponse//,
+                    cardClient.validateAndGetCardInfo(addCardRequest, userId)//,
                     //userRepository.getReferenceByUserId(userId)
                 )
         );
