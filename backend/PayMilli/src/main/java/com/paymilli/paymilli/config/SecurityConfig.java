@@ -1,0 +1,71 @@
+package com.paymilli.paymilli.config;
+
+import com.paymilli.paymilli.domain.member.jwt.JwtAccessDeniedHandler;
+import com.paymilli.paymilli.domain.member.jwt.JwtAuthenticationEntryPoint;
+import com.paymilli.paymilli.domain.member.jwt.JwtFilter;
+import com.paymilli.paymilli.domain.member.jwt.TokenProvider;
+import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+@Configuration
+@EnableWebSecurity
+@RequiredArgsConstructor
+public class SecurityConfig {
+
+    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final TokenProvider tokenProvider;
+
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(AbstractHttpConfigurer::disable)
+
+            .exceptionHandling(exception -> exception
+                .accessDeniedHandler(jwtAccessDeniedHandler)
+                .authenticationEntryPoint(jwtAuthenticationEntryPoint))
+
+            .sessionManagement(session -> session
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+
+            .authorizeHttpRequests(request -> request
+                .requestMatchers("/user/signup").permitAll()
+                .requestMatchers("/auth/authenticate").permitAll()
+//                .requestMatchers("/user/user").hasAnyRole("USER", "ADMIN")
+                .requestMatchers("/user/user").hasAnyAuthority("USER", "ADMIN")
+                .requestMatchers("/user/user/*").hasAnyAuthority("ADMIN")
+                .requestMatchers("/error").permitAll()
+                .anyRequest().authenticated())
+
+            .addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
+        ;
+
+        return http.build();
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "spring.h2.console.enabled",havingValue = "true")
+    public WebSecurityCustomizer configureH2ConsoleEnable() {
+        return web -> web.ignoring()
+            .requestMatchers(PathRequest.toH2Console());
+    }
+
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
+    }
+
+}
