@@ -41,6 +41,9 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
             .authorizeHttpRequests(request -> request
+                .requestMatchers("/member/join").permitAll()
+                .requestMatchers("/member/login").permitAll()
+                //하단부터는 테스트용
                 .requestMatchers("/user/signup").permitAll()
                 .requestMatchers("/auth/authenticate").permitAll()
 //                .requestMatchers("/user/user").hasAnyRole("USER", "ADMIN")
@@ -49,14 +52,15 @@ public class SecurityConfig {
                 .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated())
 
-            .addFilterBefore(new JwtFilter(tokenProvider), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(new JwtFilter(tokenProvider),
+                UsernamePasswordAuthenticationFilter.class)
         ;
 
         return http.build();
     }
 
     @Bean
-    @ConditionalOnProperty(name = "spring.h2.console.enabled",havingValue = "true")
+    @ConditionalOnProperty(name = "spring.h2.console.enabled", havingValue = "true")
     public WebSecurityCustomizer configureH2ConsoleEnable() {
         return web -> web.ignoring()
             .requestMatchers(PathRequest.toH2Console());
