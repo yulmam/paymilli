@@ -66,6 +66,7 @@ public class MemberController {
 
         httpHeaders.add("Set-Cookie", refreshTokenCookie.toString());
 
+        memberService.addRefreshToken(loginRequest.getMemberId(), refreshToken);
         return new ResponseEntity<>(new LoginResponse(accessToken),
             httpHeaders, HttpStatus.OK);
     }
@@ -76,5 +77,15 @@ public class MemberController {
         String memberId = tokenProvider.getMemberId(token);
 
         return new ResponseEntity<>(memberService.getMemberInfo(memberId), HttpStatus.OK);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String accessToken) {
+        String token = accessToken.split(" ")[1];
+        String memberId = tokenProvider.getMemberId(token);
+
+        memberService.logoutMember(memberId);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

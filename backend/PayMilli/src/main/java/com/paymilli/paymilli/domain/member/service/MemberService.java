@@ -61,9 +61,22 @@ public class MemberService {
     }
 
     @Transactional
+    public void addRefreshToken(String memberId, String refreshToken) {
+        Member member = memberRepository.findByMemberId(memberId).orElseThrow();
+
+        member.setRefreshToken(refreshToken);
+    }
+
+    @Transactional
     public MemberInfoResponse getMemberInfo(String memberId) {
         Member member = memberRepository.findByMemberId(memberId).orElseThrow();
 
         return member.makeResponse();
+    }
+
+    @Transactional
+    public void logoutMember(String memberId) {
+        Member member = memberRepository.findByMemberId(memberId).orElseThrow();
+        member.setRefreshToken("");
     }
 }
