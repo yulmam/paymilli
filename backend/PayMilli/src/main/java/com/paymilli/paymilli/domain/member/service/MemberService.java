@@ -2,7 +2,9 @@ package com.paymilli.paymilli.domain.member.service;
 
 import com.paymilli.paymilli.domain.member.client.MemberClient;
 import com.paymilli.paymilli.domain.member.dto.request.AddMemberRequest;
+import com.paymilli.paymilli.domain.member.dto.response.MemberInfoResponse;
 import com.paymilli.paymilli.domain.member.entity.Member;
+import com.paymilli.paymilli.domain.member.jwt.TokenProvider;
 import com.paymilli.paymilli.domain.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
@@ -16,12 +18,15 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TokenProvider tokenProvider;
     private final MemberClient memberClient;
 
     public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder,
+        TokenProvider tokenProvider,
         MemberClient memberClient) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
+        this.tokenProvider = tokenProvider;
         this.memberClient = memberClient;
     }
 
@@ -55,4 +60,10 @@ public class MemberService {
         memberRepository.save(member);
     }
 
+    @Transactional
+    public MemberInfoResponse getMemberInfo(String memberId) {
+        Member member = memberRepository.findByMemberId(memberId).orElseThrow();
+
+        return member.makeResponse();
+    }
 }

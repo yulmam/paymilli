@@ -1,8 +1,18 @@
 package com.paymilli.paymilli.domain.member.jwt;
 
-import io.jsonwebtoken.*;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import java.security.Key;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Date;
+import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
@@ -12,12 +22,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
-
-import java.security.Key;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Date;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -61,7 +65,7 @@ public class TokenProvider implements InitializingBean {
             .compact();
     }
 
-    public String createAccessToken(Authentication authentication){
+    public String createAccessToken(Authentication authentication) {
         // 권한들
         String authorities = authentication.getAuthorities().stream()
             .map(GrantedAuthority::getAuthority)
@@ -117,5 +121,14 @@ public class TokenProvider implements InitializingBean {
             log.info("JWT 토큰이 잘못되었습니다.");
         }
         return false;
+    }
+
+    public String getMemberId(String token) {
+        return Jwts.parserBuilder()
+            .setSigningKey(key) // 동일한 키 사용
+            .build()
+            .parseClaimsJws(token)
+            .getBody()
+            .getSubject(); // 토큰의 subject에서 memberId 추출
     }
 }

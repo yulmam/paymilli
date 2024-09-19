@@ -16,8 +16,10 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -66,5 +68,13 @@ public class MemberController {
 
         return new ResponseEntity<>(new LoginResponse(accessToken),
             httpHeaders, HttpStatus.OK);
+    }
+
+    @GetMapping("/info")
+    public ResponseEntity<?> getInfo(@RequestHeader("Authorization") String accessToken) {
+        String token = accessToken.split(" ")[1];
+        String memberId = tokenProvider.getMemberId(token);
+
+        return new ResponseEntity<>(memberService.getMemberInfo(memberId), HttpStatus.OK);
     }
 }

@@ -1,6 +1,7 @@
 package com.paymilli.paymilli.domain.member.entity;
 
 import com.paymilli.paymilli.domain.member.dto.request.AddMemberRequest;
+import com.paymilli.paymilli.domain.member.dto.response.MemberInfoResponse;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -65,11 +66,16 @@ public class Member {
     @Column(nullable = false)
     private String userKey;
 
+    @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private String phone;
+
 //    card 개발시 제거 예정
 //    @OneToOne
 //    @Column
 //    private Card mainCard;
-
 
     @Column
     @CreationTimestamp
@@ -109,6 +115,19 @@ public class Member {
             .role(Role.USER)
             .paymentPassword(encodePaymentPassword)
             .userKey(userKey)
+            .email(addMemberRequest.getEmail())
+            .phone(addMemberRequest.getPhone())
             .build();
     }
+
+    public MemberInfoResponse makeResponse() {
+        return MemberInfoResponse.builder()
+            .memberId(memberId)
+            .name(name)
+            .email(email)
+            .gender(gender)
+            .phone(phone)
+            .build();
+    }
+
 }
