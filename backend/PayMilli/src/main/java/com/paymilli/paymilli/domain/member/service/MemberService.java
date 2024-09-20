@@ -11,7 +11,6 @@ import com.paymilli.paymilli.domain.member.jwt.TokenProvider;
 import com.paymilli.paymilli.domain.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -55,8 +54,7 @@ public class MemberService {
 //            new CardCompLoginRequest(addMemberRequest.getEmail()));
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        LocalDateTime birthday = LocalDate.parse(addMemberRequest.getBirthday(), formatter)
-            .atStartOfDay();
+        LocalDate birthday = LocalDate.parse(addMemberRequest.getBirthday(), formatter);
 
 //        Member member = Member.toEntity(addMemberRequest, cardCompLoginResponse.getUserKey(),
 //            birthday, passwordEncoder.encode(addMemberRequest.getPassword()),
@@ -134,9 +132,7 @@ public class MemberService {
     @Transactional
     public String reissueAccessToken(String refreshToken) {
         Authentication authentication = tokenProvider.getAuthentication(refreshToken);
-        String accessToken = tokenProvider.createAccessToken(authentication);
-
-        return accessToken;
+        return tokenProvider.createAccessToken(authentication);
     }
 
     @Transactional

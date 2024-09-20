@@ -11,6 +11,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -52,7 +53,7 @@ public class Member {
     private String name;
 
     @Column(nullable = false)
-    private LocalDateTime birthday;
+    private LocalDate birthday;
 
     @Enumerated(EnumType.STRING)
     private Gender gender;
@@ -108,7 +109,7 @@ public class Member {
 //    }
 
     public static Member toEntity(AddMemberRequest addMemberRequest, String userKey,
-        LocalDateTime birthday, String encodePassword, String encodePaymentPassword) {
+        LocalDate birthday, String encodePassword, String encodePaymentPassword) {
         return Member.builder()
             .memberId(addMemberRequest.getMemberId())
             .password(encodePassword)
