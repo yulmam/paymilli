@@ -1,11 +1,7 @@
 package com.paymilli.paymilli.domain.member.service;
 
 import com.paymilli.paymilli.domain.member.entity.Member;
-import com.paymilli.paymilli.domain.member.entity.UserEntity;
 import com.paymilli.paymilli.domain.member.repository.MemberRepository;
-import com.paymilli.paymilli.domain.member.repository.UserRepository;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

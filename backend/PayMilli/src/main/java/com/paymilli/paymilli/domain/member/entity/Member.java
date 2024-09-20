@@ -136,4 +136,8 @@ public class Member {
     public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
+
+    public void setPaymentPassword(String paymentPassword) {
+        this.paymentPassword = paymentPassword;
+    }
 }

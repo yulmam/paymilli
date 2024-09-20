@@ -3,6 +3,7 @@ package com.paymilli.paymilli.domain.member.controller;
 import com.paymilli.paymilli.domain.member.dto.request.AddMemberRequest;
 import com.paymilli.paymilli.domain.member.dto.request.LoginRequest;
 import com.paymilli.paymilli.domain.member.dto.request.TokenRequest;
+import com.paymilli.paymilli.domain.member.dto.request.UpdatePaymentPasswordRequest;
 import com.paymilli.paymilli.domain.member.dto.response.LoginResponse;
 import com.paymilli.paymilli.domain.member.dto.response.TokenResponse;
 import com.paymilli.paymilli.domain.member.jwt.JwtFilter;
@@ -18,6 +19,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -92,8 +94,6 @@ public class MemberController {
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
-        //refresh Token의 일치 검사
-
         if (tokenProvider.validateToken(refreshToken)) {
             String memberId = tokenProvider.getMemberId(refreshToken);
 
@@ -105,5 +105,17 @@ public class MemberController {
         }
 
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @PutMapping("/payment/password")
+    public ResponseEntity<?> updateMember(@RequestHeader("Authorization") String accessToken,
+        @RequestBody UpdatePaymentPasswordRequest updatePaymentPasswordRequest) {
+
+        String token = accessToken.split(" ")[1];
+        String memberId = tokenProvider.getMemberId(token);
+
+        memberService.updatePaymentPassword(memberId, updatePaymentPasswordRequest);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 }

@@ -3,6 +3,7 @@ package com.paymilli.paymilli.domain.member.service;
 import com.paymilli.paymilli.domain.member.client.MemberClient;
 import com.paymilli.paymilli.domain.member.dto.request.AddMemberRequest;
 import com.paymilli.paymilli.domain.member.dto.request.TokenRequest;
+import com.paymilli.paymilli.domain.member.dto.request.UpdatePaymentPasswordRequest;
 import com.paymilli.paymilli.domain.member.dto.response.MemberInfoResponse;
 import com.paymilli.paymilli.domain.member.dto.response.TokenResponse;
 import com.paymilli.paymilli.domain.member.entity.Member;
@@ -136,5 +137,14 @@ public class MemberService {
         String accessToken = tokenProvider.createAccessToken(authentication);
 
         return accessToken;
+    }
+
+    @Transactional
+    public void updatePaymentPassword(String memberId,
+        UpdatePaymentPasswordRequest updatePaymentPasswordRequest) {
+        Member member = memberRepository.findByMemberId(memberId).orElseThrow();
+
+        member.setPaymentPassword(
+            passwordEncoder.encode(updatePaymentPasswordRequest.getPaymentPassword()));
     }
 }
