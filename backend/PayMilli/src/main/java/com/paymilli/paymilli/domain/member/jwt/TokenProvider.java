@@ -138,4 +138,8 @@ public class TokenProvider implements InitializingBean {
             .getBody()
             .getSubject(); // 토큰의 subject에서 memberId 추출
     }
+
+    public String extractAccessToken(String token) {
+        return token.split(" ")[1];
+    }
 }

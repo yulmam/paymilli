@@ -68,17 +68,17 @@ public class MemberController {
     }
 
     @GetMapping("/info")
-    public ResponseEntity<?> getInfo(@RequestHeader("Authorization") String accessToken) {
-        String token = accessToken.split(" ")[1];
-        String memberId = tokenProvider.getMemberId(token);
+    public ResponseEntity<?> getInfo(@RequestHeader("Authorization") String token) {
+        String accessToken = tokenProvider.extractAccessToken(token);
+        String memberId = tokenProvider.getMemberId(accessToken);
 
         return new ResponseEntity<>(memberService.getMemberInfo(memberId), HttpStatus.OK);
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@RequestHeader("Authorization") String accessToken) {
-        String token = accessToken.split(" ")[1];
-        String memberId = tokenProvider.getMemberId(token);
+    public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
+        String accessToken = tokenProvider.extractAccessToken(token);
+        String memberId = tokenProvider.getMemberId(accessToken);
 
         memberService.logoutMember(memberId);
 
@@ -108,10 +108,10 @@ public class MemberController {
     }
 
     @PutMapping("/payment/password")
-    public ResponseEntity<?> updateMember(@RequestHeader("Authorization") String accessToken,
+    public ResponseEntity<?> updateMember(@RequestHeader("Authorization") String token,
         @RequestBody UpdatePaymentPasswordRequest updatePaymentPasswordRequest) {
 
-        String token = accessToken.split(" ")[1];
+        String accessToken = tokenProvider.extractAccessToken(token);
         String memberId = tokenProvider.getMemberId(token);
 
         memberService.updatePaymentPassword(memberId, updatePaymentPasswordRequest);
