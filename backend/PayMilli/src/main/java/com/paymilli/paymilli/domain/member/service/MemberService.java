@@ -123,10 +123,9 @@ public class MemberService {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        String refreshToken = tokenProvider.createRefreshToken(authentication);
-        String accessToken = tokenProvider.createAccessToken(authentication);
-
-        return new TokenResponse(accessToken, refreshToken);
+        return new TokenResponse(
+            tokenProvider.createAccessToken(authentication),
+            tokenProvider.createRefreshToken(authentication));
     }
 
     @Transactional
