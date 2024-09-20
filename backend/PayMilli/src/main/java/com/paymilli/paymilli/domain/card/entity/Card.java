@@ -4,7 +4,16 @@ package com.paymilli.paymilli.domain.card.entity;
 import com.paymilli.paymilli.domain.card.dto.request.AddCardRequest;
 import com.paymilli.paymilli.domain.card.dto.response.CardInfoResponse;
 import com.paymilli.paymilli.domain.card.dto.response.CardResponse;
-import jakarta.persistence.*;
+import com.paymilli.paymilli.domain.member.entity.Member;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Temporal;
+import jakarta.persistence.TemporalType;
+import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -12,10 +21,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.UUID;
 
 @Entity
 @Getter
@@ -27,10 +32,10 @@ public class Card {
     @Id
     private UUID id;
 
-//  user 개발시 주석 제거
-//    @ManyToOne
-//    private User user;
-//
+    @ManyToOne
+    @JoinColumn(name = "member_id")
+    private Member member;
+
 //  payment 개발시 주석 제거
 //    @OneToMany(mappedBy = "card")
 //    private List<Payment> payments;
@@ -69,26 +74,27 @@ public class Card {
     @ColumnDefault("false")
     private boolean deleted;
 
-    public static Card toEntity(AddCardRequest addCardRequest, CardInfoResponse cardInfoResponse){//User user 추가 필요
+    public static Card toEntity(AddCardRequest addCardRequest,
+        CardInfoResponse cardInfoResponse) {//User user 추가 필요
         return Card.builder()
-                .cardNumber(addCardRequest.getCardNumber())
-                .CVC(addCardRequest.getCvc())
-                .expirationDate(addCardRequest.getExpirationDate())
-                .cardHolderName(addCardRequest.getCardHolderName())
-                .cardImage(cardInfoResponse.getCardImage())
-                .cardName(cardInfoResponse.getCardName())
-                .cardType(cardInfoResponse.getCardType())
-                //.user(user)
-                .build();
+            .cardNumber(addCardRequest.getCardNumber())
+            .CVC(addCardRequest.getCvc())
+            .expirationDate(addCardRequest.getExpirationDate())
+            .cardHolderName(addCardRequest.getCardHolderName())
+            .cardImage(cardInfoResponse.getCardImage())
+            .cardName(cardInfoResponse.getCardName())
+            .cardType(cardInfoResponse.getCardType())
+            //.user(user)
+            .build();
     }
 
-    public CardResponse makeResponse(){
+    public CardResponse makeResponse() {
         return CardResponse.builder()
-                .cardId(id)
-                .cardName(cardName)
-                .cardType(cardType)
-                .cardLastNum(cardNumber.substring(12, 15))
-                .cardImage(cardImage)
-                .build();
+            .cardId(id)
+            .cardName(cardName)
+            .cardType(cardType)
+            .cardLastNum(cardNumber.substring(12, 15))
+            .cardImage(cardImage)
+            .build();
     }
 }
