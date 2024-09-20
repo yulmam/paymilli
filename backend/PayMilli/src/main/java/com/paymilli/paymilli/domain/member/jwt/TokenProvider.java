@@ -41,7 +41,8 @@ public class TokenProvider implements InitializingBean {
         this.secret = secret;
         this.accessTokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
 //        this.accessTokenValidityInMilliseconds = 10;
-        this.refreshTokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
+//        this.refreshTokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
+        this.refreshTokenValidityInMilliseconds = 10;
     }
 
     @Override

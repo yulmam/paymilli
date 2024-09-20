@@ -43,6 +43,7 @@ public class SecurityConfig {
             .authorizeHttpRequests(request -> request
                 .requestMatchers("/member/join").permitAll()
                 .requestMatchers("/member/login").permitAll()
+                .requestMatchers("/member/refresh").permitAll()
                 .requestMatchers("/member/*").hasAnyAuthority("USER", "ADMIN")
                 //하단부터는 테스트용
                 .requestMatchers("/user/signup").permitAll()

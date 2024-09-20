@@ -1,5 +1,8 @@
 package com.paymilli.paymilli.global.exception;
 
+import lombok.Getter;
+
+@Getter
 public class ErrorResponse {
 
     private final String errorCode;

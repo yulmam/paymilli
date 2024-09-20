@@ -11,7 +11,7 @@ public class ExceptionAdvice {
     @ExceptionHandler(TokenExpiredException.class)
     public ResponseEntity<ErrorResponse> handleTokenExpiredException(TokenExpiredException ex) {
         ErrorResponse errorResponse = new ErrorResponse("TOKEN_EXPIRED", ex.getMessage());
-        return new ResponseEntity<>(errorResponse, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(TokenInvalidException.class)
