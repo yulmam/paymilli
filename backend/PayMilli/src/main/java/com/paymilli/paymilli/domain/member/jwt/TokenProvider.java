@@ -164,4 +164,8 @@ public class TokenProvider implements InitializingBean {
 
         return ops.get(getMemberId(refreshToken));
     }
+
+    public void removeRefreshToken(String memberId) {
+        redisTemplate.delete(memberId);
+    }
 }

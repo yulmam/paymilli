@@ -17,6 +17,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -57,7 +58,6 @@ public class MemberController {
         Cookie refreshTokenCookie = generateRefreshTokenCookie(tokenResponse.getRefreshToken());
         response.addCookie(refreshTokenCookie);
 
-        memberService.addRefreshToken(loginRequest.getMemberId(), tokenResponse.getRefreshToken());
         return new ResponseEntity<>(new LoginResponse(tokenResponse.getAccessToken()),
             httpHeaders, HttpStatus.OK);
     }
@@ -83,7 +83,7 @@ public class MemberController {
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(
         @CookieValue(value = "refreshToken", required = false) String refreshToken) {
-        
+
         if (refreshToken == null) {
             log.info("refreshToken not found");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
@@ -98,6 +98,16 @@ public class MemberController {
         }
 
         return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> deleteMember(@RequestHeader("Authorization") String token) {
+        String accessToken = tokenProvider.extractAccessToken(token);
+        String memberId = tokenProvider.getMemberId(accessToken);
+
+        memberService.deleteMember(memberId);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PutMapping("/payment/password")

@@ -70,13 +70,6 @@ public class MemberService {
     }
 
     @Transactional
-    public void addRefreshToken(String memberId, String refreshToken) {
-        Member member = memberRepository.findByMemberId(memberId).orElseThrow();
-
-        member.setRefreshToken(refreshToken);
-    }
-
-    @Transactional
     public MemberInfoResponse getMemberInfo(String memberId) {
         Member member = memberRepository.findByMemberId(memberId).orElseThrow();
 
@@ -85,8 +78,7 @@ public class MemberService {
 
     @Transactional
     public void logoutMember(String memberId) {
-        Member member = memberRepository.findByMemberId(memberId).orElseThrow();
-        member.setRefreshToken("");
+        tokenProvider.removeRefreshToken(memberId);
     }
 
     @Transactional
@@ -147,5 +139,13 @@ public class MemberService {
 
         member.setPaymentPassword(
             passwordEncoder.encode(updatePaymentPasswordRequest.getPaymentPassword()));
+    }
+
+    @Transactional
+    public void deleteMember(String memberId) {
+        Member member = memberRepository.findByMemberId(memberId).orElseThrow();
+        member.delete();
+
+        tokenProvider.removeRefreshToken(memberId);
     }
 }

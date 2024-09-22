@@ -134,4 +134,8 @@ public class Member {
     public void setPaymentPassword(String paymentPassword) {
         this.paymentPassword = paymentPassword;
     }
+
+    public void delete() {
+        deleted = true;
+    }
 }
