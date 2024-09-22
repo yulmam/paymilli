@@ -14,10 +14,13 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -33,16 +36,19 @@ public class TokenProvider implements InitializingBean {
     private final String secret;
     private final long accessTokenValidityInMilliseconds;
     private final long refreshTokenValidityInMilliseconds;
+    private final RedisTemplate<String, String> redisTemplate;
     private Key key;
 
     public TokenProvider(
         @Value("${jwt.secret}") String secret,
-        @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds) {
+        @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds,
+        RedisTemplate<String, String> redisTemplate) {
         this.secret = secret;
         this.accessTokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
 //        this.accessTokenValidityInMilliseconds = 10;
         this.refreshTokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
 //        this.refreshTokenValidityInMilliseconds = 10;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
@@ -61,12 +67,21 @@ public class TokenProvider implements InitializingBean {
         long now = (new Date()).getTime();
         Date validity = new Date(now + this.refreshTokenValidityInMilliseconds);
 
-        return Jwts.builder()
+        String refreshToken = Jwts.builder()
             .setSubject(authentication.getName())
             .claim(AUTHORITIES_KEY, authorities)
             .signWith(key, SignatureAlgorithm.HS512)
             .setExpiration(validity)
             .compact();
+
+        redisTemplate.opsForValue().set(
+            authentication.getName(),
+            refreshToken,
+            refreshTokenValidityInMilliseconds,
+            TimeUnit.MICROSECONDS
+        );
+
+        return refreshToken;
     }
 
     public String createAccessToken(Authentication authentication) {
@@ -141,5 +156,12 @@ public class TokenProvider implements InitializingBean {
 
     public String extractAccessToken(String token) {
         return token.split(" ")[1];
+    }
+
+
+    public String getRefreshToken(String refreshToken) {
+        ValueOperations<String, String> ops = redisTemplate.opsForValue();
+
+        return ops.get(getMemberId(refreshToken));
     }
 }

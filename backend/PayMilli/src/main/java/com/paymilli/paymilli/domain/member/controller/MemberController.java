@@ -83,16 +83,14 @@ public class MemberController {
     @PostMapping("/refresh")
     public ResponseEntity<?> refreshToken(
         @CookieValue(value = "refreshToken", required = false) String refreshToken) {
-
+        
         if (refreshToken == null) {
             log.info("refreshToken not found");
             return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
         }
 
         if (tokenProvider.validateToken(refreshToken)) {
-            String memberId = tokenProvider.getMemberId(refreshToken);
-
-            if (memberService.isSameRefreshToken(memberId, refreshToken)) {
+            if (memberService.isSameRefreshToken(refreshToken)) {
                 String accessToken = memberService.reissueAccessToken(refreshToken);
 
                 return new ResponseEntity<>(new LoginResponse(accessToken), HttpStatus.OK);
