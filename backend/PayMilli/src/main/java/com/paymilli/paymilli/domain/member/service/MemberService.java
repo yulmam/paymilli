@@ -12,6 +12,7 @@ import com.paymilli.paymilli.domain.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
@@ -20,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
+@Slf4j
 public class MemberService {
 
     private final MemberRepository memberRepository;
@@ -68,13 +70,6 @@ public class MemberService {
     }
 
     @Transactional
-    public void addRefreshToken(String memberId, String refreshToken) {
-        Member member = memberRepository.findByMemberId(memberId).orElseThrow();
-
-        member.setRefreshToken(refreshToken);
-    }
-
-    @Transactional
     public MemberInfoResponse getMemberInfo(String memberId) {
         Member member = memberRepository.findByMemberId(memberId).orElseThrow();
 
@@ -83,14 +78,17 @@ public class MemberService {
 
     @Transactional
     public void logoutMember(String memberId) {
-        Member member = memberRepository.findByMemberId(memberId).orElseThrow();
-        member.setRefreshToken("");
+        tokenProvider.removeRefreshToken(memberId);
     }
 
-    public boolean isSameRefreshToken(String memberId, String refreshToken) {
-        Member member = memberRepository.findByMemberId(memberId).orElseThrow();
+    @Transactional
+    public boolean isSameRefreshToken(String refreshToken) {
+        String savedRefreshToken = tokenProvider.getRefreshToken(refreshToken);
 
-        return member.getRefreshToken().equals(refreshToken);
+        log.info("input: " + refreshToken);
+        log.info("saved: " + savedRefreshToken);
+
+        return savedRefreshToken != null;
     }
 
     @Transactional
@@ -141,5 +139,13 @@ public class MemberService {
 
         member.setPaymentPassword(
             passwordEncoder.encode(updatePaymentPasswordRequest.getPaymentPassword()));
+    }
+
+    @Transactional
+    public void deleteMember(String memberId) {
+        Member member = memberRepository.findByMemberId(memberId).orElseThrow();
+        member.delete();
+
+        tokenProvider.removeRefreshToken(memberId);
     }
 }

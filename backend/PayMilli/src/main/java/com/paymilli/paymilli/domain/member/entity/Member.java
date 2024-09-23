@@ -73,9 +73,6 @@ public class Member {
     @Column(nullable = false)
     private String phone;
 
-    @Column
-    private String refreshToken;
-
 //    card 개발시 제거 예정
 //    @OneToOne
 //    @Column
@@ -134,11 +131,11 @@ public class Member {
             .build();
     }
 
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
-
     public void setPaymentPassword(String paymentPassword) {
         this.paymentPassword = paymentPassword;
+    }
+
+    public void delete() {
+        deleted = true;
     }
 }

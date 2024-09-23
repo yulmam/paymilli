@@ -1,4 +1,4 @@
-package com.paymilli.paymilli.config;
+package com.paymilli.paymilli.global.config;
 
 import com.paymilli.paymilli.domain.member.jwt.JwtAccessDeniedHandler;
 import com.paymilli.paymilli.domain.member.jwt.JwtAuthenticationEntryPoint;
