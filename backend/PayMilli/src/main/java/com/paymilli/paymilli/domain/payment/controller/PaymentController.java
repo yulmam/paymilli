@@ -29,8 +29,10 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping("/demand")
-    public ResponseEntity<?> demandPayment(@RequestBody DemandPaymentRequest demandPaymentRequest) {
-        return new ResponseEntity<>(paymentService.issueTransactionId(demandPaymentRequest),
+    public ResponseEntity<?> demandPayment(
+        @RequestHeader("Authorization") String token,
+        @RequestBody DemandPaymentRequest demandPaymentRequest) {
+        return new ResponseEntity<>(paymentService.issueTransactionId(token, demandPaymentRequest),
             HttpStatus.OK);
     }
 

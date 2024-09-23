@@ -9,7 +9,7 @@ import java.time.LocalDate;
 
 public interface PaymentService {
 
-    String issueTransactionId(DemandPaymentRequest demandPaymentRequest);
+    String issueTransactionId(String token, DemandPaymentRequest demandPaymentRequest);
 
     void approvePayment(String token, String transactionId,
         ApprovePaymentRequest approvePaymentRequest);

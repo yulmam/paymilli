@@ -1,5 +1,6 @@
 package com.paymilli.paymilli.domain.payment.service;
 
+import com.paymilli.paymilli.domain.member.jwt.TokenProvider;
 import com.paymilli.paymilli.domain.payment.dto.request.ApprovePaymentRequest;
 import com.paymilli.paymilli.domain.payment.dto.request.DemandPaymentRequest;
 import com.paymilli.paymilli.domain.payment.dto.request.RefundPaymentRequest;
@@ -14,8 +15,17 @@ import org.springframework.stereotype.Service;
 public class PaymentServiceImpl implements PaymentService {
 
 
+    private final TokenProvider tokenProvider;
+
+    public PaymentServiceImpl(TokenProvider tokenProvider) {
+        this.tokenProvider = tokenProvider;
+    }
+
     @Override
-    public String issueTransactionId(DemandPaymentRequest demandPaymentRequest) {
+    public String issueTransactionId(String token, DemandPaymentRequest demandPaymentRequest) {
+        String accessToken = tokenProvider.extractAccessToken(token);
+        String memberId = tokenProvider.getMemberId(accessToken);
+
         return "";
     }
 
