@@ -8,7 +8,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import com.paymilli.paymilli.domain.card.entity.Card;
-import com.paymilli.paymilli.domain.member.entity.Member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -72,4 +71,8 @@ public class Payment {
 	@UpdateTimestamp
 	@Temporal(TemporalType.TIMESTAMP)
 	private LocalDateTime updatedAt;
+
+	public void setApproveNumber(String approveNumber) {
+		this.approveNumber = approveNumber;
+	}
 }

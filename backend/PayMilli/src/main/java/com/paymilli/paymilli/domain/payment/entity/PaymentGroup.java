@@ -12,6 +12,8 @@ import com.paymilli.paymilli.domain.member.entity.Member;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -48,6 +50,10 @@ public class PaymentGroup {
 	@Column(name = "total_price", nullable = false)
 	private long totalPrice;
 
+	@Enumerated(EnumType.STRING)
+	@Column(name = "payment_status")
+	private PaymentStatus status;
+
 	@Column(name = "transmission_date", nullable = false)
 	private LocalDateTime transmissionDate;
 
@@ -71,4 +77,8 @@ public class PaymentGroup {
 	@UpdateTimestamp
 	@Temporal(TemporalType.TIMESTAMP)
 	private LocalDateTime updatedAt;
+
+	public void setStatus(PaymentStatus status) {
+		this.status = status;
+	}
 }
