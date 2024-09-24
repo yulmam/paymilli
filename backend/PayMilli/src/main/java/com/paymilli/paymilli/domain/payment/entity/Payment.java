@@ -1,15 +1,8 @@
 package com.paymilli.paymilli.domain.payment.entity;
 
-import java.time.LocalDateTime;
-import java.util.UUID;
-
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import com.paymilli.paymilli.domain.card.entity.Card;
-import com.paymilli.paymilli.domain.member.entity.Member;
-
+import com.paymilli.paymilli.domain.payment.dto.request.DemandPaymentCardRequest;
+import com.paymilli.paymilli.domain.payment.dto.response.PaymentResponse;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -19,10 +12,15 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
+import java.time.LocalDateTime;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Getter
@@ -32,44 +30,67 @@ import lombok.NoArgsConstructor;
 @Table(name = "payment")
 public class Payment {
 
-	@Id
-	@GeneratedValue
-	@Column
-	private UUID id;
+    @Id
+    @GeneratedValue
+    @Column
+    private UUID id;
 
-	@ManyToOne
-	@JoinColumn(name = "card_id")
-	private Card card;
+    @ManyToOne
+    @JoinColumn(name = "card_id")
+    private Card card;
 
-	@ManyToOne
-	@JoinColumn(name = "payment_group_id")
-	private PaymentGroup paymentGroup;
+    @ManyToOne
+    @JoinColumn(name = "payment_group_id")
+    private PaymentGroup paymentGroup;
 
-	// 가격
-	@Column(nullable = false)
-	private long price;
+    // 가격
+    @Column(nullable = false)
+    private int price;
 
-	// 할부개월
-	@Column(nullable = false)
-	private int installment;
+    // 할부개월
+    @Column(nullable = false)
+    private int installment;
 
-	// 승인번호
-	@Column(nullable = false, name = "approve_number")
-	private String approveNumber;
+    // 승인번호
+    @Column(nullable = false, name = "approve_number")
+    private String approveNumber;
 
-	// 삭제 여부
-	@Column(nullable = false)
-	@ColumnDefault("false")
-	private boolean deleted;
+    // 삭제 여부
+    @Column(nullable = false)
+    @ColumnDefault("false")
+    private boolean deleted;
 
 
-	@Column
-	@CreationTimestamp
-	@Temporal(TemporalType.TIMESTAMP)
-	private LocalDateTime createdAt;
+    @Column
+    @CreationTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime createdAt;
 
-	@Column
-	@UpdateTimestamp
-	@Temporal(TemporalType.TIMESTAMP)
-	private LocalDateTime updatedAt;
+    @Column
+    @UpdateTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime updatedAt;
+
+    public static Payment toEntity(DemandPaymentCardRequest demandPaymentCardRequest) {
+        return Payment.builder()
+            .price(demandPaymentCardRequest.getCardPrice())
+            .installment(demandPaymentCardRequest.getInstallment())
+            .build();
+    }
+
+    public PaymentResponse makeResponse() {
+        return PaymentResponse.builder()
+            .cardId(id.toString())
+            .cardName(card.getCardName())
+            .chargePrice(price)
+            .build();
+    }
+
+    public void setPaymentGroup(PaymentGroup paymentGroup) {
+        this.paymentGroup = paymentGroup;
+    }
+
+    public void setCard(Card card) {
+        this.card = card;
+    }
 }

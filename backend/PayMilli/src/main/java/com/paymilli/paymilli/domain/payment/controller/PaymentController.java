@@ -65,7 +65,7 @@ public class PaymentController {
     public ResponseEntity<?> getPayment(
         @RequestHeader("Authorization") String token,
         @PathVariable("id") String id) {
-        return new ResponseEntity<>(paymentService.getPayment(id),
+        return new ResponseEntity<>(paymentService.getPaymentGroup(id),
             HttpStatus.OK);
     }
 
