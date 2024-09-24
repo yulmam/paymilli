@@ -77,7 +77,7 @@ public class Card {
     private boolean deleted;
 
     public static Card toEntity(AddCardRequest addCardRequest,
-        CardInfoResponse cardInfoResponse) {//User user 추가 필요
+        CardInfoResponse cardInfoResponse, Member member) {
         return Card.builder()
             .cardNumber(addCardRequest.getCardNumber())
             .CVC(addCardRequest.getCvc())
@@ -86,7 +86,7 @@ public class Card {
             .cardImage(cardInfoResponse.getCardImage())
             .cardName(cardInfoResponse.getCardName())
             .cardType(cardInfoResponse.getCardType())
-            //.user(user)
+            .member(member)
             .build();
     }
 
@@ -108,4 +108,6 @@ public class Card {
         payments.add(payment);
         payment.setCard(this);
     }
+
+
 }
