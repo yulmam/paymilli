@@ -1,6 +1,8 @@
 package com.paymilli.paymilli.domain.member.service;
 
 import com.paymilli.paymilli.domain.member.client.MemberClient;
+import com.paymilli.paymilli.domain.member.dto.client.CardCompLoginRequest;
+import com.paymilli.paymilli.domain.member.dto.client.CardCompLoginResponse;
 import com.paymilli.paymilli.domain.member.dto.request.AddMemberRequest;
 import com.paymilli.paymilli.domain.member.dto.request.TokenRequest;
 import com.paymilli.paymilli.domain.member.dto.request.UpdatePaymentPasswordRequest;
@@ -52,17 +54,13 @@ public class MemberService {
             throw new RuntimeException("이미 가입되어 있는 사용자 입니다.");
         }
 
-//        CardCompLoginResponse cardCompLoginResponse = memberClient.validateAndGetUserKey(
-//            new CardCompLoginRequest(addMemberRequest.getEmail()));
+        CardCompLoginResponse cardCompLoginResponse = memberClient.validateAndGetUserKey(
+            new CardCompLoginRequest(addMemberRequest.getEmail()));
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         LocalDate birthday = LocalDate.parse(addMemberRequest.getBirthday(), formatter);
 
-//        Member member = Member.toEntity(addMemberRequest, cardCompLoginResponse.getUserKey(),
-//            birthday, passwordEncoder.encode(addMemberRequest.getPassword()),
-//            passwordEncoder.encode(addMemberRequest.getPaymentPassword()));
-
-        Member member = Member.toEntity(addMemberRequest, "",
+        Member member = Member.toEntity(addMemberRequest, cardCompLoginResponse.getUserKey(),
             birthday, passwordEncoder.encode(addMemberRequest.getPassword()),
             passwordEncoder.encode(addMemberRequest.getPaymentPassword()));
 
@@ -85,9 +83,6 @@ public class MemberService {
     public boolean isSameRefreshToken(String refreshToken) {
         String savedRefreshToken = tokenProvider.getRefreshToken(refreshToken);
 
-        log.info("input: " + refreshToken);
-        log.info("saved: " + savedRefreshToken);
-
         return savedRefreshToken != null;
     }
 
@@ -106,24 +101,6 @@ public class MemberService {
         String accessToken = tokenProvider.createAccessToken(authentication);
 
         return new TokenResponse(accessToken, refreshToken);
-    }
-
-    @Transactional
-    public TokenResponse issueTokens(String memberId) {
-        Member member = memberRepository.findByMemberId(memberId).orElseThrow();
-
-        UsernamePasswordAuthenticationToken token =
-            new UsernamePasswordAuthenticationToken(member.getMemberId(),
-                member.getPassword());
-
-        Authentication authentication = authenticationManagerBuilder.getObject()
-            .authenticate(token);
-
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        return new TokenResponse(
-            tokenProvider.createAccessToken(authentication),
-            tokenProvider.createRefreshToken(authentication));
     }
 
     @Transactional

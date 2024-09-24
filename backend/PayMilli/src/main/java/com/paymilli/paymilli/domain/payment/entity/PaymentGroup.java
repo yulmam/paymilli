@@ -1,13 +1,5 @@
 package com.paymilli.paymilli.domain.payment.entity;
 
-import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
-
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
-
 import com.paymilli.paymilli.domain.member.entity.Member;
 import com.paymilli.paymilli.domain.payment.dto.request.DemandPaymentRequest;
 import com.paymilli.paymilli.domain.payment.dto.response.PaymentGroupResponse;
@@ -58,12 +50,12 @@ public class PaymentGroup {
     @Column(name = "total_price", nullable = false)
     private int totalPrice;
 
-	@Enumerated(EnumType.STRING)
-	@Column(name = "payment_status")
-	private PaymentStatus status;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "payment_status")
+    private PaymentStatus status;
 
-	@Column(name = "transmission_date", nullable = false)
-	private LocalDateTime transmissionDate;
+    @Column(name = "transmission_date", nullable = false)
+    private LocalDateTime transmissionDate;
 
     @Column(name = "store_name", nullable = false)
     private String storeName;
@@ -81,14 +73,10 @@ public class PaymentGroup {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
 
-	@Column
-	@UpdateTimestamp
-	@Temporal(TemporalType.TIMESTAMP)
-	private LocalDateTime updatedAt;
-
-	public void setStatus(PaymentStatus status) {
-		this.status = status;
-	}
+    @Column
+    @UpdateTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime updatedAt;
 
     public static PaymentGroup toEntity(DemandPaymentRequest demandPaymentRequest) {
         return PaymentGroup.builder()
@@ -97,6 +85,14 @@ public class PaymentGroup {
             .storeName(demandPaymentRequest.getStoreName())
             .productName(demandPaymentRequest.getDetail())
             .build();
+    }
+
+    public void setStatus(PaymentStatus status) {
+        this.status = status;
+    }
+
+    public void setMember(Member member) {
+        this.member = member;
     }
 
     public PaymentGroupResponse makeResponse() {
