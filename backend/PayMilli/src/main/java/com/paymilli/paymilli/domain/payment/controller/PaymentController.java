@@ -42,9 +42,11 @@ public class PaymentController {
         @RequestHeader("transactionId") String transactionId,
         @RequestBody ApprovePaymentRequest approvePaymentRequest) {
 
-        paymentService.approvePayment(token, transactionId, approvePaymentRequest);
+        if (paymentService.approvePayment(token, transactionId, approvePaymentRequest)) {
+            return new ResponseEntity<>("결제가 정상처리 되었습니다.", HttpStatus.OK);
+        }
 
-        return new ResponseEntity<>("결제가 정상처리 되었습니다.", HttpStatus.OK);
+        return new ResponseEntity<>("결제 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
     }
 
     @GetMapping
@@ -73,9 +75,12 @@ public class PaymentController {
     public ResponseEntity<?> refundPayment(
         @RequestHeader("Authorization") String token,
         @RequestBody RefundPaymentRequest refundPaymentRequest) {
+        if (paymentService.refundPayment(refundPaymentRequest)) {
+            return new ResponseEntity<>("환불 요청이 처리되었습니다.",
+                HttpStatus.OK);
+        }
 
-        paymentService.refundPayment(refundPaymentRequest);
-        return new ResponseEntity<>("환불 요청이 처리되었습니다.",
-            HttpStatus.OK);
+        return new ResponseEntity<>("환불 오류가 발생하였습니다.",
+            HttpStatus.NOT_FOUND);
     }
 }
