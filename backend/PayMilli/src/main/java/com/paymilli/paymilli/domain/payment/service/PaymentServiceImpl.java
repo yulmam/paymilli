@@ -82,15 +82,19 @@ public class PaymentServiceImpl implements PaymentService {
         DemandPaymentRequest data = (DemandPaymentRequest) redisUtil.getDataFromRedis(
             transactionId);
 
+        log.info(data.toString());
+
         redisUtil.removeDataFromRedis(transactionId);
 
         PaymentGroup paymentGroup = PaymentGroup.toEntity(data);
+
+        log.info(paymentGroup.toString());
 
         for (DemandPaymentCardRequest demandPaymentCardRequest : data.getPaymentCards()) {
             Payment payment = Payment.toEntity(demandPaymentCardRequest);
 
             //없으면 예외 터짐
-            Card card = cardRepository.getReferenceById(demandPaymentCardRequest.getCardId());
+            Card card = cardRepository.findById(demandPaymentCardRequest.getCardId()).get();
             card.addPayment(payment);
 
             paymentGroup.addPayment(payment);

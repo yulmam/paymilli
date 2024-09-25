@@ -9,6 +9,7 @@ import lombok.ToString;
 public class DemandPaymentCardRequest {
 
     private UUID cardId;
-    private int cardPrice;
+    private int chargePrice;
     private int installment;
 }
+

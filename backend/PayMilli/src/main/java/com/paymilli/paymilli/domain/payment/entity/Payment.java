@@ -3,7 +3,7 @@ package com.paymilli.paymilli.domain.payment.entity;
 import com.paymilli.paymilli.domain.card.entity.Card;
 import com.paymilli.paymilli.domain.payment.dto.request.DemandPaymentCardRequest;
 import com.paymilli.paymilli.domain.payment.dto.response.PaymentResponse;
-
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -36,11 +36,11 @@ public class Payment {
     @Column
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "card_id")
     private Card card;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "payment_group_id")
     private PaymentGroup paymentGroup;
 
@@ -67,20 +67,20 @@ public class Payment {
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime createdAt;
 
-	@Column
-	@UpdateTimestamp
-	@Temporal(TemporalType.TIMESTAMP)
-	private LocalDateTime updatedAt;
-
-	public void setApproveNumber(String approveNumber) {
-		this.approveNumber = approveNumber;
-	}
+    @Column
+    @UpdateTimestamp
+    @Temporal(TemporalType.TIMESTAMP)
+    private LocalDateTime updatedAt;
 
     public static Payment toEntity(DemandPaymentCardRequest demandPaymentCardRequest) {
         return Payment.builder()
-            .price(demandPaymentCardRequest.getCardPrice())
+            .price(demandPaymentCardRequest.getChargePrice())
             .installment(demandPaymentCardRequest.getInstallment())
             .build();
+    }
+
+    public void setApproveNumber(String approveNumber) {
+        this.approveNumber = approveNumber;
     }
 
     public PaymentResponse makeResponse() {

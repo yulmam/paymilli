@@ -3,6 +3,7 @@ package com.paymilli.paymilli.domain.payment.entity;
 import com.paymilli.paymilli.domain.member.entity.Member;
 import com.paymilli.paymilli.domain.payment.dto.request.DemandPaymentRequest;
 import com.paymilli.paymilli.domain.payment.dto.response.PaymentGroupResponse;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -39,7 +40,7 @@ public class PaymentGroup {
     @Column
     private UUID id;
 
-    @ManyToOne
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "member_id")
     private Member member;
 
