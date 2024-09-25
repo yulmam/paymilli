@@ -14,6 +14,7 @@ import com.paymilli.paymilli.domain.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -60,7 +61,7 @@ public class MemberService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         LocalDate birthday = LocalDate.parse(addMemberRequest.getBirthday(), formatter);
 
-        Member member = Member.toEntity(addMemberRequest, cardCompLoginResponse.getUserKey(),
+        Member member = Member.toEntity(addMemberRequest, "",//cardCompLoginResponse.getUserKey(),
             birthday, passwordEncoder.encode(addMemberRequest.getPassword()),
             passwordEncoder.encode(addMemberRequest.getPaymentPassword()));
 
@@ -68,14 +69,14 @@ public class MemberService {
     }
 
     @Transactional
-    public MemberInfoResponse getMemberInfo(String memberId) {
-        Member member = memberRepository.findByMemberId(memberId).orElseThrow();
+    public MemberInfoResponse getMemberInfo(UUID memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow();
 
         return member.makeResponse();
     }
 
     @Transactional
-    public void logoutMember(String memberId) {
+    public void logoutMember(UUID memberId) {
         tokenProvider.removeRefreshToken(memberId);
     }
 
@@ -110,17 +111,17 @@ public class MemberService {
     }
 
     @Transactional
-    public void updatePaymentPassword(String memberId,
+    public void updatePaymentPassword(UUID memberId,
         UpdatePaymentPasswordRequest updatePaymentPasswordRequest) {
-        Member member = memberRepository.findByMemberId(memberId).orElseThrow();
+        Member member = memberRepository.findById(memberId).orElseThrow();
 
         member.setPaymentPassword(
             passwordEncoder.encode(updatePaymentPasswordRequest.getPaymentPassword()));
     }
 
     @Transactional
-    public void deleteMember(String memberId) {
-        Member member = memberRepository.findByMemberId(memberId).orElseThrow();
+    public void deleteMember(UUID memberId) {
+        Member member = memberRepository.findById(memberId).orElseThrow();
         member.delete();
 
         tokenProvider.removeRefreshToken(memberId);

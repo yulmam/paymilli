@@ -6,7 +6,6 @@ import com.paymilli.paymilli.domain.card.dto.request.DeleteCardRequest;
 import com.paymilli.paymilli.domain.card.dto.response.CardResponse;
 import com.paymilli.paymilli.domain.card.service.CardService;
 import com.paymilli.paymilli.domain.member.jwt.TokenProvider;
-import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
@@ -37,7 +36,7 @@ public class CardController {
         @RequestBody AddCardRequest addCardRequest) {
         //userId 수정 필요
         String accessToken = tokenProvider.extractAccessToken(token);
-        UUID memberId = UUID.fromString(tokenProvider.getMemberId(accessToken));
+        UUID memberId = tokenProvider.getId(accessToken);
 
         cardService.registerCard(addCardRequest, memberId);
 
@@ -46,18 +45,20 @@ public class CardController {
 
 
     @GetMapping
-    public ResponseEntity<List<CardResponse>> searchCards(@RequestHeader("Authorization") String token) {
+    public ResponseEntity<List<CardResponse>> searchCards(
+        @RequestHeader("Authorization") String token) {
         //userId 수정 필요
         String accessToken = tokenProvider.extractAccessToken(token);
-        UUID memberId = UUID.fromString(tokenProvider.getMemberId(accessToken));
+        UUID memberId = tokenProvider.getId(accessToken);
         return new ResponseEntity<>(cardService.searchCards(memberId), HttpStatus.OK);
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token, @RequestBody DeleteCardRequest deleteCardRequest) {
+    public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token,
+        @RequestBody DeleteCardRequest deleteCardRequest) {
         //userId 수정 필요
         String accessToken = tokenProvider.extractAccessToken(token);
-        UUID memberId = UUID.fromString(tokenProvider.getMemberId(accessToken));
+        UUID memberId = tokenProvider.getId(accessToken);
 
         cardService.deleteCard(deleteCardRequest.getCardId(), memberId);
         return new ResponseEntity<>(HttpStatus.OK);

@@ -11,6 +11,7 @@ import com.paymilli.paymilli.domain.member.jwt.TokenProvider;
 import com.paymilli.paymilli.domain.member.service.MemberService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -65,7 +66,7 @@ public class MemberController {
     @GetMapping("/info")
     public ResponseEntity<?> getInfo(@RequestHeader("Authorization") String token) {
         String accessToken = tokenProvider.extractAccessToken(token);
-        String memberId = tokenProvider.getMemberId(accessToken);
+        UUID memberId = tokenProvider.getId(accessToken);
 
         return new ResponseEntity<>(memberService.getMemberInfo(memberId), HttpStatus.OK);
     }
@@ -73,7 +74,7 @@ public class MemberController {
     @PostMapping("/logout")
     public ResponseEntity<?> logout(@RequestHeader("Authorization") String token) {
         String accessToken = tokenProvider.extractAccessToken(token);
-        String memberId = tokenProvider.getMemberId(accessToken);
+        UUID memberId = tokenProvider.getId(accessToken);
 
         memberService.logoutMember(memberId);
 
@@ -103,7 +104,7 @@ public class MemberController {
     @DeleteMapping
     public ResponseEntity<?> deleteMember(@RequestHeader("Authorization") String token) {
         String accessToken = tokenProvider.extractAccessToken(token);
-        String memberId = tokenProvider.getMemberId(accessToken);
+        UUID memberId = tokenProvider.getId(accessToken);
 
         memberService.deleteMember(memberId);
 
@@ -115,7 +116,7 @@ public class MemberController {
         @RequestBody UpdatePaymentPasswordRequest updatePaymentPasswordRequest) {
 
         String accessToken = tokenProvider.extractAccessToken(token);
-        String memberId = tokenProvider.getMemberId(accessToken);
+        UUID memberId = tokenProvider.getId(accessToken);
 
         memberService.updatePaymentPassword(memberId, updatePaymentPasswordRequest);
 

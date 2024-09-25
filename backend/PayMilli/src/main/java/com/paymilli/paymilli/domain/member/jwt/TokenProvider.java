@@ -1,5 +1,7 @@
 package com.paymilli.paymilli.domain.member.jwt;
 
+import com.paymilli.paymilli.domain.member.entity.Member;
+import com.paymilli.paymilli.domain.member.repository.MemberRepository;
 import com.paymilli.paymilli.global.exception.TokenExpiredException;
 import com.paymilli.paymilli.global.exception.TokenInvalidException;
 import com.paymilli.paymilli.global.util.RedisUtil;
@@ -15,6 +17,7 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -36,19 +39,22 @@ public class TokenProvider implements InitializingBean {
     private final long accessTokenValidityInMilliseconds;
     private final long refreshTokenValidityInMilliseconds;
     private final RedisUtil redisUtil;
+    private final MemberRepository memberRepository;
     //    private final RedisTemplate<String, String> redisTemplate;
     private Key key;
 
     public TokenProvider(
         @Value("${jwt.secret}") String secret,
         @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds,
-        RedisTemplate<String, String> redisTemplate, RedisUtil redisUtil) {
+        RedisTemplate<String, String> redisTemplate, RedisUtil redisUtil,
+        MemberRepository memberRepository) {
         this.secret = secret;
         this.accessTokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
 //        this.accessTokenValidityInMilliseconds = 10;
         this.refreshTokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
         this.redisUtil = redisUtil;
 //        this.refreshTokenValidityInMilliseconds = 10;
+        this.memberRepository = memberRepository;
     }
 
     @Override
@@ -67,8 +73,10 @@ public class TokenProvider implements InitializingBean {
         long now = (new Date()).getTime();
         Date validity = new Date(now + this.refreshTokenValidityInMilliseconds);
 
+        UUID id = getUUID(authentication);
+
         String refreshToken = Jwts.builder()
-            .setSubject(authentication.getName())
+            .setSubject(id.toString())
             .claim(AUTHORITIES_KEY, authorities)
             .signWith(key, SignatureAlgorithm.HS512)
             .setExpiration(validity)
@@ -90,12 +98,21 @@ public class TokenProvider implements InitializingBean {
         long now = (new Date()).getTime();
         Date validity = new Date(now + this.accessTokenValidityInMilliseconds);
 
+        UUID id = getUUID(authentication);
+
         return Jwts.builder()
-            .setSubject(authentication.getName())
+            .setSubject(id.toString())
             .claim(AUTHORITIES_KEY, authorities)
             .signWith(key, SignatureAlgorithm.HS512)
             .setExpiration(validity)
             .compact();
+    }
+
+    private UUID getUUID(Authentication authentication) {
+        String memberID = authentication.getName();
+
+        Member member = memberRepository.findByMemberId(memberID).orElseThrow();
+        return member.getId();
     }
 
     public Authentication getAuthentication(String token) {
@@ -141,13 +158,13 @@ public class TokenProvider implements InitializingBean {
         }
     }
 
-    public String getMemberId(String token) {
-        return Jwts.parserBuilder()
+    public UUID getId(String token) {
+        return UUID.fromString(Jwts.parserBuilder()
             .setSigningKey(key) // 동일한 키 사용
             .build()
             .parseClaimsJws(token)
             .getBody()
-            .getSubject(); // 토큰의 subject에서 memberId 추출
+            .getSubject()); // 토큰의 subject에서 memberId 추출
     }
 
     public String extractAccessToken(String token) {
@@ -159,7 +176,7 @@ public class TokenProvider implements InitializingBean {
         return (String) redisUtil.getDataFromRedis(refreshToken);
     }
 
-    public void removeRefreshToken(String memberId) {
-        redisUtil.removeDataFromRedis(memberId);
+    public void removeRefreshToken(UUID memberId) {
+        redisUtil.removeDataFromRedis(memberId.toString());
     }
 }

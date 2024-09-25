@@ -54,7 +54,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public String issueTransactionId(String token, DemandPaymentRequest demandPaymentRequest) {
         String accessToken = tokenProvider.extractAccessToken(token);
-        String memberId = tokenProvider.getMemberId(accessToken);
+        UUID memberId = tokenProvider.getId(accessToken);
 
         //redis key
         Random random = new Random();
@@ -71,7 +71,7 @@ public class PaymentServiceImpl implements PaymentService {
     public boolean approvePayment(String token, String transactionId,
         ApprovePaymentRequest approvePaymentRequest) {
         String accessToken = tokenProvider.extractAccessToken(token);
-        Member member = memberRepository.findByMemberId(tokenProvider.getMemberId(accessToken))
+        Member member = memberRepository.findById(tokenProvider.getId(accessToken))
             .orElseThrow();
 
         if (isNotSamePaymentPassword(member, approvePaymentRequest.getPassword())) {
@@ -103,13 +103,13 @@ public class PaymentServiceImpl implements PaymentService {
     public SearchPaymentGroupResponse searchPaymentGroup(String token, int sort, int page, int size,
         LocalDate startDate, LocalDate endDate) {
         String accessToken = tokenProvider.extractAccessToken(token);
-        String memberId = tokenProvider.getMemberId(accessToken);
+        UUID memberId = tokenProvider.getId(accessToken);
 
         Direction dir = (sort == 0) ? Direction.DESC : Direction.ASC;
 
         Pageable pageable = PageRequest.of(page, size, dir, "transmission_date");
 
-        Page<PaymentGroup> paymentGroups = paymentGroupRepository.findByMemberId(memberId,
+        Page<PaymentGroup> paymentGroups = paymentGroupRepository.findById(memberId,
             pageable);
 
         MetaResponse meta = MetaResponse.builder()

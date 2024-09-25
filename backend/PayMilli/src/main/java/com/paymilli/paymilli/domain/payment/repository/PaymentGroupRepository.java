@@ -8,5 +8,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface PaymentGroupRepository extends JpaRepository<PaymentGroup, UUID> {
 
-    Page<PaymentGroup> findByMemberId(String memberId, Pageable pageable);
+    Page<PaymentGroup> findById(UUID memberId, Pageable pageable);
 }
