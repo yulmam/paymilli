@@ -25,8 +25,9 @@ import java.util.UUID;
 public class Payment {
 
     @Id
-    @Column(columnDefinition = "BINARY(16)")
-    private UUID id = UlidCreator.getMonotonicUlid().toUuid();
+    @GeneratedValue
+    @Column
+    private UUID id;
 
     @Column(nullable = false)
     private Long price;
