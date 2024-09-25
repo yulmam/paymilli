@@ -29,3 +29,4 @@ cloud:
 
 ssafy:
   apiKey:${API_KEY}
+

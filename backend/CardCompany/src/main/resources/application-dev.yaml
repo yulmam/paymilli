@@ -1,14 +1,17 @@
+server:
+  servlet:
+    context-path: /api/v1/cardcompany
+
 spring:
+  config:
+    import: optional:file:.env[.properties]
   application:
     name: PayMilli
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://root_db_1:3306/exampledb?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
-    username: user
+    url: jdbc:mysql://localhost:3306/cardcompanydb?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    username: root
     password: 1234
-  #  jackson:
-  #    serialization:
-  #      fail-on-empty-beans: false
   jpa:
     properties:
       hibernate:
