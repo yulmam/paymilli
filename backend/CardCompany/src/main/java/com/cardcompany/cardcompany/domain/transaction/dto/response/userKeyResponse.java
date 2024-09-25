@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class userKeyResponse {
-    private String apiKey;
+    private String userKey;
 }
