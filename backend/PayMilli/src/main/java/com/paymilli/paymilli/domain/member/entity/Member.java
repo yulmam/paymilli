@@ -132,6 +132,10 @@ public class Member {
         deleted = true;
     }
 
+    public void create() {
+        deleted = false;
+    }
+
     public MemberInfoResponse makeResponse() {
         return MemberInfoResponse.builder()
             .memberId(memberId)

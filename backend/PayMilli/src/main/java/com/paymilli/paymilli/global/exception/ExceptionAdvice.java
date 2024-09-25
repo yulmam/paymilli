@@ -1,5 +1,6 @@
 package com.paymilli.paymilli.global.exception;
 
+import com.paymilli.paymilli.domain.member.exception.MemberNotExistException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -17,6 +18,12 @@ public class ExceptionAdvice {
     @ExceptionHandler(TokenInvalidException.class)
     public ResponseEntity<ErrorResponse> handleInvalidTokenException(TokenInvalidException ex) {
         ErrorResponse errorResponse = new ErrorResponse("INVALID_TOKEN", ex.getMessage());
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MemberNotExistException.class)
+    public ResponseEntity<ErrorResponse> handleMemberNotExistException(MemberNotExistException ex) {
+        ErrorResponse errorResponse = new ErrorResponse("MEMBER_NOT_EXIST", ex.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 }

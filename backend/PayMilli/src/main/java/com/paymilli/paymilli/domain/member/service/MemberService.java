@@ -9,11 +9,13 @@ import com.paymilli.paymilli.domain.member.dto.request.UpdatePaymentPasswordRequ
 import com.paymilli.paymilli.domain.member.dto.response.MemberInfoResponse;
 import com.paymilli.paymilli.domain.member.dto.response.TokenResponse;
 import com.paymilli.paymilli.domain.member.entity.Member;
+import com.paymilli.paymilli.domain.member.exception.MemberNotExistException;
 import com.paymilli.paymilli.domain.member.jwt.TokenProvider;
 import com.paymilli.paymilli.domain.member.repository.MemberRepository;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -44,14 +46,18 @@ public class MemberService {
     }
 
     @Transactional
-    public boolean isAlreadyRegister(String memberId) {
-        return memberRepository.findByMemberId(memberId).isPresent();
-    }
-
-
-    @Transactional
     public void addMember(AddMemberRequest addMemberRequest) {
-        if (isAlreadyRegister(addMemberRequest.getMemberId())) {
+        Optional<Member> memberOpt = memberRepository.findByMemberId(
+            addMemberRequest.getMemberId());
+
+        if (memberOpt.isPresent()) {
+            Member member = memberOpt.get();
+
+            if (member.isDeleted()) {
+                member.create();
+                return;
+            }
+
             throw new RuntimeException("이미 가입되어 있는 사용자 입니다.");
         }
 
@@ -70,9 +76,7 @@ public class MemberService {
 
     @Transactional
     public MemberInfoResponse getMemberInfo(UUID memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow();
-
-        return member.makeResponse();
+        return getMemberById(memberId).makeResponse();
     }
 
     @Transactional
@@ -113,7 +117,7 @@ public class MemberService {
     @Transactional
     public void updatePaymentPassword(UUID memberId,
         UpdatePaymentPasswordRequest updatePaymentPasswordRequest) {
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = getMemberById(memberId);
 
         member.setPaymentPassword(
             passwordEncoder.encode(updatePaymentPasswordRequest.getPaymentPassword()));
@@ -121,9 +125,21 @@ public class MemberService {
 
     @Transactional
     public void deleteMember(UUID memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow();
+        Member member = getMemberById(memberId);
         member.delete();
 
         tokenProvider.removeRefreshToken(memberId);
+    }
+
+    @Transactional
+    public Member getMemberById(UUID memberId) {
+        Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new MemberNotExistException("Member Not found"));
+
+        if (member.isDeleted()) {
+            throw new IllegalArgumentException();
+        }
+
+        return member;
     }
 }

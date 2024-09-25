@@ -29,7 +29,6 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "payment_group")
@@ -77,6 +76,15 @@ public class PaymentGroup {
     @UpdateTimestamp
     @Temporal(TemporalType.TIMESTAMP)
     private LocalDateTime updatedAt;
+
+    @Builder
+    public PaymentGroup(int totalPrice, LocalDateTime transmissionDate, String storeName,
+        String productName) {
+        this.totalPrice = totalPrice;
+        this.transmissionDate = transmissionDate;
+        this.storeName = storeName;
+        this.productName = productName;
+    }
 
     public static PaymentGroup toEntity(DemandPaymentRequest demandPaymentRequest) {
         return PaymentGroup.builder()
