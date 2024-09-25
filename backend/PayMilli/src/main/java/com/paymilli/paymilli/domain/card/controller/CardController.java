@@ -8,6 +8,7 @@ import com.paymilli.paymilli.domain.card.service.CardService;
 import com.paymilli.paymilli.domain.member.jwt.TokenProvider;
 import java.util.List;
 import java.util.UUID;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/board")
+@Slf4j
 public class CardController {
 
     private final CardService cardService;
@@ -34,6 +36,8 @@ public class CardController {
     public ResponseEntity<?> registerCard(
         @RequestHeader("Authorization") String token,
         @RequestBody AddCardRequest addCardRequest) {
+
+        log.info("카드 등록 요청");
         //userId 수정 필요
         String accessToken = tokenProvider.extractAccessToken(token);
         UUID memberId = tokenProvider.getId(accessToken);

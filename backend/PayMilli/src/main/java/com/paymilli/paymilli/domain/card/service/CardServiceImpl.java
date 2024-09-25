@@ -10,9 +10,11 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 public class CardServiceImpl implements CardService {
 
@@ -31,15 +33,17 @@ public class CardServiceImpl implements CardService {
     }
 
 
-
     @Transactional
     public void registerCard(AddCardRequest addCardRequest, UUID memberId) {
+        log.info("카드 등록 서비스");
         Optional<Card> cardOpt = cardRepository.findByCardNumberAndMemberId(
             addCardRequest.getCardNumber(), memberId);
-        if(cardOpt.isPresent()){
+
+        if (cardOpt.isPresent()) {
             Card card = cardOpt.get();
-            if(!card.isDeleted())
+            if (!card.isDeleted()) {
                 throw new IllegalArgumentException();
+            }
             card.create();
             return;
         }
@@ -63,7 +67,8 @@ public class CardServiceImpl implements CardService {
 
     @Transactional
     public void deleteCard(UUID cardId, UUID memberId) {
-        Card card = cardRepository.findByIdAndMemberId(cardId, memberId).orElseThrow(IllegalArgumentException::new);
+        Card card = cardRepository.findByIdAndMemberId(cardId, memberId)
+            .orElseThrow(IllegalArgumentException::new);
         card.delete();
     }
 }

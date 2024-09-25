@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AddCardRequest {
-    private String CardNumber;
+
+    private String cardNumber;
     private String cvc;
     private String expirationDate;
     private String cardHolderName;
