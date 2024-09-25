@@ -82,6 +82,8 @@ public class PaymentServiceImpl implements PaymentService {
         DemandPaymentRequest data = (DemandPaymentRequest) redisUtil.getDataFromRedis(
             transactionId);
 
+        redisUtil.removeDataFromRedis(transactionId);
+
         PaymentGroup paymentGroup = PaymentGroup.toEntity(data);
 
         for (DemandPaymentCardRequest demandPaymentCardRequest : data.getPaymentCards()) {
