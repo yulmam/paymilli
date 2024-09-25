@@ -4,6 +4,5 @@ import lombok.Getter;
 
 @Getter
 public class CardCompLoginResponse {
-
     private String userKey;
 }
