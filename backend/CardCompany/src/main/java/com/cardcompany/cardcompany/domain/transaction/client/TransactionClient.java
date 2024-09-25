@@ -1,6 +1,7 @@
 package com.cardcompany.cardcompany.domain.transaction.client;
 
 import com.cardcompany.cardcompany.domain.transaction.dto.client.*;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -30,7 +31,6 @@ public class TransactionClient {
 
     public UpdateDemandDepositAccountWithdrawalResponse payCheck(
         UpdateDemandDepositAccountWithdrawalRequest request) {
-        System.out.println(request.getAccountNo());
         return webClient.post()
             .uri("/edu/demandDeposit/updateDemandDepositAccountWithdrawal")
             .accept(MediaType.APPLICATION_JSON)
