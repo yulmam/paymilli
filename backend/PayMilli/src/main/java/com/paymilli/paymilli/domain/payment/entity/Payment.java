@@ -33,7 +33,7 @@ public class Payment {
 
     @Id
     @GeneratedValue
-    @Column
+    @Column(columnDefinition = "BINARY(16)")
     private UUID id;
 
     @ManyToOne(cascade = CascadeType.PERSIST)

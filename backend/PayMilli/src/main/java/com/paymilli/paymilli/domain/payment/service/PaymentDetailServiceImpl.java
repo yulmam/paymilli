@@ -12,6 +12,7 @@ import com.paymilli.paymilli.domain.payment.exception.PaymentCardException;
 import com.paymilli.paymilli.domain.payment.exception.PaymentMilliException;
 import com.paymilli.paymilli.domain.payment.repository.PaymentGroupRepository;
 import com.paymilli.paymilli.domain.payment.repository.PaymentRepository;
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class PaymentDetailServiceImpl implements PaymentDetailService {
     private final PaymentRepository paymentRepository;
     private final PaymentGroupRepository paymentGroupRepository;
 
+    @Transactional
     @Override
     public boolean requestPaymentGroup(PaymentGroup paymentGroup) {
 
@@ -59,6 +61,9 @@ public class PaymentDetailServiceImpl implements PaymentDetailService {
 
             // 성공시 결제 내역 DB 저장
             if (paymentSuccess) {
+                paymentGroup.setStatus(PaymentStatus.PAYMENT);
+                paymentGroupRepository.save(paymentGroup);
+
                 for (int i = 0; i < paymentGroupSize; i++) {
                     Payment payment = paymentGroup.getPayments().get(i);
 
@@ -67,8 +72,6 @@ public class PaymentDetailServiceImpl implements PaymentDetailService {
                     payment.setApproveNumber(approveNumbers[i]);
                     paymentRepository.save(payment);
                 }
-
-                paymentGroupRepository.save(paymentGroup);
             }
         }
 
@@ -94,6 +97,7 @@ public class PaymentDetailServiceImpl implements PaymentDetailService {
     }
 
 
+    @Transactional
     @Override
     public boolean refundPaymentGroup(PaymentGroup paymentGroup) {
 

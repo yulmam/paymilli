@@ -17,6 +17,7 @@ import com.paymilli.paymilli.domain.payment.entity.Payment;
 import com.paymilli.paymilli.domain.payment.entity.PaymentGroup;
 import com.paymilli.paymilli.domain.payment.repository.PaymentGroupRepository;
 import com.paymilli.paymilli.global.util.RedisUtil;
+import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Random;
@@ -51,6 +52,7 @@ public class PaymentServiceImpl implements PaymentService {
         this.memberRepository = memberRepository;
     }
 
+    @Transactional
     @Override
     public String issueTransactionId(String token, DemandPaymentRequest demandPaymentRequest) {
         String accessToken = tokenProvider.extractAccessToken(token);
@@ -67,6 +69,7 @@ public class PaymentServiceImpl implements PaymentService {
         return transactionId;
     }
 
+    @Transactional
     @Override
     public boolean approvePayment(String token, String transactionId,
         ApprovePaymentRequest approvePaymentRequest) {
@@ -98,11 +101,13 @@ public class PaymentServiceImpl implements PaymentService {
             card.addPayment(payment);
 
             paymentGroup.addPayment(payment);
+            member.addPaymentGroup(paymentGroup);
         }
 
         return paymentDetailService.requestPaymentGroup(paymentGroup);
     }
 
+    @Transactional
     @Override
     public SearchPaymentGroupResponse searchPaymentGroup(String token, int sort, int page, int size,
         LocalDate startDate, LocalDate endDate) {
@@ -134,6 +139,7 @@ public class PaymentServiceImpl implements PaymentService {
         return new SearchPaymentGroupResponse(meta, transactions);
     }
 
+    @Transactional
     @Override
     public PaymentGroupResponse getPaymentGroup(String paymentGroupId) {
         PaymentGroup paymentGroup = paymentGroupRepository.findById(UUID.fromString(paymentGroupId))
@@ -142,10 +148,12 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentGroup.makeResponse();
     }
 
+    @Transactional
     @Override
     public boolean refundPayment(RefundPaymentRequest refundPaymentRequest) {
+        log.info("uuid: " + refundPaymentRequest.getPaymentId());
         PaymentGroup paymentGroup = paymentGroupRepository.findById(
-            UUID.fromString(refundPaymentRequest.getPaymentId())).orElseThrow();
+            refundPaymentRequest.getPaymentId()).orElseThrow();
 
         return paymentDetailService.refundPaymentGroup(paymentGroup);
     }

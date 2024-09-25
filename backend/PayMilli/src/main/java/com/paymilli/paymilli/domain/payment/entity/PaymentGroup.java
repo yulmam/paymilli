@@ -20,7 +20,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -31,22 +30,19 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Entity
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
 @Table(name = "payment_group")
 public class PaymentGroup {
 
+    @OneToMany(mappedBy = "paymentGroup")
+    private final List<Payment> payments = new ArrayList<Payment>();
     @Id
     @GeneratedValue
-    @Column
-    private UUID id;
+    @Column(columnDefinition = "BINARY(16)")
 
+    private UUID id;
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "member_id")
     private Member member;
-
-    @OneToMany(mappedBy = "paymentGroup")
-    private List<Payment> payments = new ArrayList<Payment>();
-
     @Column(name = "total_price", nullable = false)
     private int totalPrice;
 
