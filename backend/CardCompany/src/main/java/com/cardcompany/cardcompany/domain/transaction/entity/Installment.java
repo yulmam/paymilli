@@ -2,6 +2,7 @@ package com.cardcompany.cardcompany.domain.transaction.entity;
 
 import com.github.f4b6a3.ulid.UlidCreator;
 import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
