@@ -6,6 +6,5 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class CardCompLoginRequest {
-
     private final String email;
 }

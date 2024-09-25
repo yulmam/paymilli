@@ -1,5 +1,7 @@
 package com.paymilli.paymilli.domain.card.client;
 
+import com.paymilli.paymilli.domain.card.dto.client.CardValidationRequest;
+import com.paymilli.paymilli.domain.card.dto.client.CardValidationResponse;
 import com.paymilli.paymilli.domain.card.dto.request.AddCardRequest;
 import com.paymilli.paymilli.domain.card.dto.response.CardInfoResponse;
 import org.springframework.http.MediaType;
@@ -17,14 +19,14 @@ public class CardClient {
         this.webClient = webClient;
     }
 
-    public CardInfoResponse validateAndGetCardInfo(AddCardRequest addCardRequest, UUID userId) {
+    public CardValidationResponse validateAndGetCardInfo(CardValidationRequest request) {
         return webClient.post()
                 .uri("/validation")
                 .accept(MediaType.APPLICATION_JSON)
                 .acceptCharset(StandardCharsets.UTF_8)
-                .bodyValue(addCardRequest)
+                .bodyValue(request)
                 .retrieve()
-                .bodyToMono(CardInfoResponse.class)
+                .bodyToMono(CardValidationResponse.class)
                 .blockOptional()
                 .orElseThrow();
     }
