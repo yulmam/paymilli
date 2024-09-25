@@ -19,7 +19,7 @@ public class MemberClient {
     public CardCompLoginResponse validateAndGetUserKey(
         CardCompLoginRequest cardCompLoginRequest) {
         return webClient.post()
-            .uri("/login")
+            .uri("/join")
             .accept(MediaType.APPLICATION_JSON)
             .acceptCharset(StandardCharsets.UTF_8)
             .bodyValue(cardCompLoginRequest)
