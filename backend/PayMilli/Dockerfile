@@ -8,6 +8,8 @@ WORKDIR /app
 COPY build/libs/PayMilli-0.0.1-SNAPSHOT.jar /app/app.jar
 COPY .env /app/
 
+ENV TZ="Asia/Seoul"
+
 # Expose port 8080 to the outside world
 EXPOSE 8080
 
