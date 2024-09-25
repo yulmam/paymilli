@@ -28,8 +28,9 @@ import java.util.UUID;
 public class Card {
 
     @Id
-    @Column(columnDefinition = "BINARY(16)")
-    private UUID id = UlidCreator.getMonotonicUlid().toUuid();
+    @GeneratedValue
+    @Column
+    private UUID id;
 
     @Column(nullable = false)
     private String cardNumber;
