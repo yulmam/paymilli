@@ -2,6 +2,7 @@ package com.paymilli.paymilli.domain.card.entity;
 
 
 import com.github.f4b6a3.ulid.UlidCreator;
+import com.paymilli.paymilli.domain.card.dto.client.CardValidationResponse;
 import com.paymilli.paymilli.domain.card.dto.request.AddCardRequest;
 import com.paymilli.paymilli.domain.card.dto.response.CardInfoResponse;
 import com.paymilli.paymilli.domain.card.dto.response.CardResponse;
@@ -104,15 +105,15 @@ public class Card {
     }
 
     public static Card toEntity(AddCardRequest addCardRequest,
-        CardInfoResponse cardInfoResponse, Member member) {
+        CardValidationResponse cardValidationResponse, Member member) {
         return Card.builder()
             .cardNumber(addCardRequest.getCardNumber())
             .CVC(addCardRequest.getCvc())
             .expirationDate(addCardRequest.getExpirationDate())
             .cardHolderName(addCardRequest.getCardHolderName())
-            .cardImage(cardInfoResponse.getCardImage())
-            .cardName(cardInfoResponse.getCardName())
-            .cardType(cardInfoResponse.getCardType())
+            .cardImage(cardValidationResponse.getCardImage())
+            .cardName(cardValidationResponse.getCardName())
+            .cardType(cardValidationResponse.getCardType())
             .member(member)
             .build();
     }
@@ -122,7 +123,7 @@ public class Card {
             .cardId(id)
             .cardName(cardName)
             .cardType(cardType)
-            .cardLastNum(cardNumber.substring(12, 15))
+            .cardLastNum(cardNumber.substring(12, 16))
             .cardImage(cardImage)
             .build();
     }
