@@ -39,7 +39,7 @@ public class Member {
 
     @Id
     @GeneratedValue
-    @Column
+    @Column(columnDefinition = "BINARY(16)")
     private UUID id;
 
     @OneToMany(mappedBy = "member")

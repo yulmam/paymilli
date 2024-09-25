@@ -1,10 +1,8 @@
 package com.paymilli.paymilli.domain.card.entity;
 
 
-import com.github.f4b6a3.ulid.UlidCreator;
 import com.paymilli.paymilli.domain.card.dto.client.CardValidationResponse;
 import com.paymilli.paymilli.domain.card.dto.request.AddCardRequest;
-import com.paymilli.paymilli.domain.card.dto.response.CardInfoResponse;
 import com.paymilli.paymilli.domain.card.dto.response.CardResponse;
 import com.paymilli.paymilli.domain.member.entity.Member;
 import com.paymilli.paymilli.domain.payment.entity.Payment;
@@ -38,7 +36,7 @@ public class Card {
 
     @Id
     @GeneratedValue
-    @Column
+    @Column(columnDefinition = "BINARY(16)")
     private UUID id;
 
     @ManyToOne
@@ -82,14 +80,6 @@ public class Card {
     @ColumnDefault("false")
     private boolean deleted;
 
-    public void delete(){
-        deleted = true;
-    }
-
-    public void create(){
-        deleted = false;
-    }
-
     @Builder
     public Card(Member member, String cardNumber, String CVC, String expirationDate,
         String cardName,
@@ -116,6 +106,14 @@ public class Card {
             .cardType(cardValidationResponse.getCardType())
             .member(member)
             .build();
+    }
+
+    public void delete() {
+        deleted = true;
+    }
+
+    public void create() {
+        deleted = false;
     }
 
     public CardResponse makeResponse() {
