@@ -121,9 +121,6 @@ public class Card {
 
     public UpdateDemandDepositAccountWithdrawalRequest makeUpdateDemandDepositAccountWithdrawalResponse(
         String paymentBalance, String apiKey) {
-        System.out.println(account);
-        System.out.println(paymentBalance);
-        System.out.println("test");
         return UpdateDemandDepositAccountWithdrawalRequest.builder()
             .globalHeader(
                 new GlobalHeaderRequest(

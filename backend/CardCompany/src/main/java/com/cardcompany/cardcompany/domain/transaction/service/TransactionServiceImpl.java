@@ -60,7 +60,6 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public CardInfoResponse getCardInfo(CardValidationRequest request) {
-        System.out.println(request.getCardNumber());
         return cardRepository
             .findByCardNumberAndCvcAndExpirationDateAndCardPasswordAndUserKey(
                 request.getCardNumber(),
@@ -109,7 +108,7 @@ public class TransactionServiceImpl implements TransactionService {
 
     public void checkRefund(Payment payment) {
         UpdateDemandDepositAccountDepositResponse response = transactionClient.refundCheck(
-            payment.makeUpdateDemandDepositAccountDepositRequest(keyProperties.getApiKey())
+            payment.makeUpdateDemandDepositAccountDepositRequest(keyProperties.getApikey())
         );
         paymentRepository.delete(payment);
     }
@@ -137,11 +136,11 @@ public class TransactionServiceImpl implements TransactionService {
                 .build()
         );
 
-        //payment가 된다면 
+        //payment가 된다면
         UpdateDemandDepositAccountWithdrawalResponse response = transactionClient.payCheck(
             card.makeUpdateDemandDepositAccountWithdrawalResponse(
                 String.valueOf(request.getPrice()),
-                keyProperties.getApiKey()
+                keyProperties.getApikey()
             )
         );
 
