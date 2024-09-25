@@ -7,6 +7,7 @@ import com.cardcompany.cardcompany.domain.transaction.dto.response.CardInfoRespo
 import com.cardcompany.cardcompany.global.header.GlobalHeaderRequest;
 import com.github.f4b6a3.ulid.UlidCreator;
 import jakarta.persistence.Column;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
