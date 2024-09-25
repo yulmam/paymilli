@@ -8,6 +8,7 @@ import com.paymilli.paymilli.domain.payment.exception.PaymentCardException;
 import java.nio.charset.StandardCharsets;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -65,24 +66,12 @@ public class PaymentClient {
             .acceptCharset(StandardCharsets.UTF_8)
             .bodyValue(paymentRefundRequest)
             .exchangeToMono(clientResponse -> {
-                HttpStatus statusCode = (HttpStatus) clientResponse.statusCode();
+                HttpStatusCode statusCode = clientResponse.statusCode();  // 상태 코드 가져오기
 
-                if (statusCode.is2xxSuccessful()) {
-                    // 성공적인 응답 처리
-                    return clientResponse.bodyToMono(PaymentRefundResponse.class);
-                } else if (statusCode.is4xxClientError()) {
-                    // 401 Unauthorized 처리 / 실패
-                    return clientResponse.bodyToMono(String.class)
-                        .flatMap(errorBody -> Mono.error(
-                            new PaymentCardException("refund fail: " + errorBody)));
-                } else {
-                    // 예외적인 상태 코드 처리
-                    return Mono.error(
-                        new IllegalStateException("Unexpected status code: " + statusCode));
-                }
+                // PaymentRefundResponse 객체 생성 및 반환
+                return Mono.just(new PaymentRefundResponse(statusCode));
             })
-            .blockOptional()
-            .orElseThrow();
+            .block();  // 동기적으로 결과 반환
     }
 
     public String testRequestToCardCompany() {
