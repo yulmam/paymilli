@@ -61,7 +61,7 @@ public class MemberService {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
         LocalDate birthday = LocalDate.parse(addMemberRequest.getBirthday(), formatter);
 
-        Member member = Member.toEntity(addMemberRequest, "",//cardCompLoginResponse.getUserKey(),
+        Member member = Member.toEntity(addMemberRequest, cardCompLoginResponse.getUserKey(),
             birthday, passwordEncoder.encode(addMemberRequest.getPassword()),
             passwordEncoder.encode(addMemberRequest.getPaymentPassword()));
 
