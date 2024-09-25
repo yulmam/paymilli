@@ -5,6 +5,7 @@ import com.cardcompany.cardcompany.domain.transaction.dto.client.UpdateDemandDep
 import com.cardcompany.cardcompany.global.header.GlobalHeaderRequest;
 import com.github.f4b6a3.ulid.UlidCreator;
 import jakarta.persistence.*;
+import jakarta.persistence.GeneratedValue;
 import java.util.ArrayList;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
