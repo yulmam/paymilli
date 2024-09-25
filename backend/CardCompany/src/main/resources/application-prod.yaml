@@ -28,6 +28,6 @@ spring:
 
 
 ssafy:
-  apiKey: ${api.key}
+  apikey: ${api.key}
 
 
