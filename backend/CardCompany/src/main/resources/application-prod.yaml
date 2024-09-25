@@ -1,6 +1,6 @@
 server:
   servlet:
-    context-path: /api/v1/cardCompany
+    context-path: /api/v1/cardcompany
 
 spring:
   config:
@@ -16,13 +16,16 @@ spring:
     password: ${db.password}
 
   jpa:
-    open-in-view: true
-    hibernate:
-      ddl-auto: create
-    show-sql: true
     properties:
-      hibernate.format_sql: true
-      dialect: org.hibernate.dialect.MySQL8InnoDBDialect
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        globally_quoted_identifiers: true
+        format_sql: true
+        show_sql: true
+    hibernate:
+      ddl-auto: update
+    open-in-view: true
+
 
 ssafy:
   apiKey:${api.key}
