@@ -6,9 +6,11 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.UUID;
+import lombok.NoArgsConstructor;
 
 @Getter
 @Builder
+@NoArgsConstructor
 @AllArgsConstructor
 public class CardResponse {
     private UUID cardId;
