@@ -9,10 +9,12 @@ import com.paymilli.paymilli.domain.member.entity.Member;
 import com.paymilli.paymilli.domain.payment.entity.Payment;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.time.LocalDateTime;
@@ -30,11 +32,13 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Table(name = "card")
 public class Card {
 
     @Id
-    @Column(columnDefinition = "BINARY(16)")
-    private UUID id = UlidCreator.getMonotonicUlid().toUuid();
+    @GeneratedValue
+    @Column
+    private UUID id;
 
     @ManyToOne
     @JoinColumn(name = "member_id")
