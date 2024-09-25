@@ -15,6 +15,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -26,6 +27,7 @@ import java.util.UUID;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
+@Slf4j
 public class Card {
 
     @Id
@@ -120,12 +122,16 @@ public class Card {
     }
 
     public UpdateDemandDepositAccountWithdrawalRequest makeUpdateDemandDepositAccountWithdrawalResponse(
-        String paymentBalance, String apiKey) {
+        String paymentBalance, String apikey) {
+        log.info(apikey);
+        log.info(paymentBalance);
+        log.info(account);
+        log.info(userKey);
         return UpdateDemandDepositAccountWithdrawalRequest.builder()
             .globalHeader(
                 new GlobalHeaderRequest(
                     "updateDemandDepositAccountWithdrawal",
-                    apiKey,
+                    apikey,
                     userKey
                 )
             )
