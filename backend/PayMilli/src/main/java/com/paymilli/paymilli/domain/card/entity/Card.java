@@ -1,6 +1,7 @@
 package com.paymilli.paymilli.domain.card.entity;
 
 
+import com.github.f4b6a3.ulid.UlidCreator;
 import com.paymilli.paymilli.domain.card.dto.request.AddCardRequest;
 import com.paymilli.paymilli.domain.card.dto.response.CardInfoResponse;
 import com.paymilli.paymilli.domain.card.dto.response.CardResponse;
@@ -27,13 +28,13 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 @Getter
-@Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class Card {
 
     @Id
-    private UUID id;
+    @Column(columnDefinition = "BINARY(16)")
+    private UUID id = UlidCreator.getMonotonicUlid().toUuid();
 
     @ManyToOne
     @JoinColumn(name = "member_id")
@@ -75,6 +76,28 @@ public class Card {
 
     @ColumnDefault("false")
     private boolean deleted;
+
+    public void delete(){
+        deleted = true;
+    }
+
+    public void create(){
+        deleted = false;
+    }
+
+    @Builder
+    public Card(Member member, String cardNumber, String CVC, String expirationDate,
+        String cardName,
+        String cardHolderName, String cardImage, CardType cardType) {
+        this.member = member;
+        this.cardNumber = cardNumber;
+        this.CVC = CVC;
+        this.expirationDate = expirationDate;
+        this.cardName = cardName;
+        this.cardHolderName = cardHolderName;
+        this.cardImage = cardImage;
+        this.cardType = cardType;
+    }
 
     public static Card toEntity(AddCardRequest addCardRequest,
         CardInfoResponse cardInfoResponse, Member member) {

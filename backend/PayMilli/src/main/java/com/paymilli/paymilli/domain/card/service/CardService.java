@@ -7,8 +7,6 @@ import java.util.UUID;
 
 public interface CardService {
 
-    boolean isAlreadyRegister(String cardNumber, UUID memberId);
-
     void registerCard(AddCardRequest addCardRequest, UUID memberId);
 
     List<CardResponse> searchCards(UUID userId);

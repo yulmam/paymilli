@@ -37,7 +37,7 @@ public class CardController {
         @RequestBody AddCardRequest addCardRequest) {
         //userId 수정 필요
         String accessToken = tokenProvider.extractAccessToken(token);
-        UUID memberId = UUID.fromString(tokenProvider.getMemberId(token));
+        UUID memberId = UUID.fromString(tokenProvider.getMemberId(accessToken));
 
         cardService.registerCard(addCardRequest, memberId);
 
@@ -46,18 +46,20 @@ public class CardController {
 
 
     @GetMapping
-    public ResponseEntity<List<CardResponse>> searchCards(HttpServletRequest request) {
+    public ResponseEntity<List<CardResponse>> searchCards(@RequestHeader("Authorization") String token) {
         //userId 수정 필요
-        UUID userId = null;
-        return new ResponseEntity<>(cardService.searchCards(userId), HttpStatus.OK);
+        String accessToken = tokenProvider.extractAccessToken(token);
+        UUID memberId = UUID.fromString(tokenProvider.getMemberId(accessToken));
+        return new ResponseEntity<>(cardService.searchCards(memberId), HttpStatus.OK);
     }
 
     @DeleteMapping
-    public ResponseEntity<?> deleteCard(@RequestBody DeleteCardRequest deleteCardRequest,
-        HttpServletRequest request) {
+    public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token, @RequestBody DeleteCardRequest deleteCardRequest) {
         //userId 수정 필요
-        UUID userId = null;
-        cardService.deleteCard(deleteCardRequest.getCardId(), userId);
+        String accessToken = tokenProvider.extractAccessToken(token);
+        UUID memberId = UUID.fromString(tokenProvider.getMemberId(accessToken));
+
+        cardService.deleteCard(deleteCardRequest.getCardId(), memberId);
         return new ResponseEntity<>(HttpStatus.OK);
     }
 }

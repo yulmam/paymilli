@@ -7,6 +7,7 @@ import com.paymilli.paymilli.domain.card.entity.Card;
 import com.paymilli.paymilli.domain.card.repository.CardRepository;
 import com.paymilli.paymilli.domain.member.repository.MemberRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.stereotype.Service;
@@ -29,15 +30,18 @@ public class CardServiceImpl implements CardService {
         this.memberRepository = memberRepository;
     }
 
-    @Transactional
-    public boolean isAlreadyRegister(String cardNumber, UUID memberId) {
-        return cardRepository.findByCardNumberAndMemberId(cardNumber, memberId).isPresent();
-    }
+
 
     @Transactional
     public void registerCard(AddCardRequest addCardRequest, UUID memberId) {
-        if (isAlreadyRegister(addCardRequest.getCardNumber(), memberId)) {
-            throw new IllegalArgumentException();
+        Optional<Card> cardOpt = cardRepository.findByCardNumberAndMemberId(
+            addCardRequest.getCardNumber(), memberId);
+        if(cardOpt.isPresent()){
+            Card card = cardOpt.get();
+            if(!card.isDeleted())
+                throw new IllegalArgumentException();
+            card.create();
+            return;
         }
 
         cardRepository.save(
@@ -52,12 +56,14 @@ public class CardServiceImpl implements CardService {
     @Transactional
     public List<CardResponse> searchCards(UUID memberId) {
         return cardRepository.findByMemberId(memberId).stream()
+            .filter(card -> !card.isDeleted())
             .map(Card::makeResponse)
             .collect(Collectors.toList());
     }
 
     @Transactional
     public void deleteCard(UUID cardId, UUID memberId) {
-        cardRepository.deleteByIdAndMemberId(cardId, memberId);
+        Card card = cardRepository.findByIdAndMemberId(cardId, memberId).orElseThrow(IllegalArgumentException::new);
+        card.delete();
     }
 }
