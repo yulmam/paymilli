@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.concurrent.ThreadLocalRandom;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Getter
 @NoArgsConstructor
 public class GlobalHeaderRequest {
@@ -37,6 +39,8 @@ public class GlobalHeaderRequest {
         LocalDateTime now = LocalDateTime.now();
         this.transmissionDate = now.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
         this.transmissionTime = now.format(DateTimeFormatter.ofPattern("HHmmss"));
+        log.info(transmissionDate);
+        log.info(transmissionTime);
     }
 
     private void makeUniqueTransactionCode() {
