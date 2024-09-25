@@ -5,14 +5,17 @@ import com.paymilli.paymilli.domain.card.dto.request.AddCardRequest;
 import com.paymilli.paymilli.domain.card.dto.response.CardInfoResponse;
 import com.paymilli.paymilli.domain.card.dto.response.CardResponse;
 import com.paymilli.paymilli.domain.member.entity.Member;
+import com.paymilli.paymilli.domain.payment.entity.Payment;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -36,9 +39,8 @@ public class Card {
     @JoinColumn(name = "member_id")
     private Member member;
 
-//  payment 개발시 주석 제거
-//    @OneToMany(mappedBy = "card")
-//    private List<Payment> payments;
+    @OneToMany(mappedBy = "card")
+    private List<Payment> payments;
 
     @Column(nullable = false)
     private String cardNumber;
@@ -75,7 +77,7 @@ public class Card {
     private boolean deleted;
 
     public static Card toEntity(AddCardRequest addCardRequest,
-        CardInfoResponse cardInfoResponse) {//User user 추가 필요
+        CardInfoResponse cardInfoResponse, Member member) {
         return Card.builder()
             .cardNumber(addCardRequest.getCardNumber())
             .CVC(addCardRequest.getCvc())
@@ -84,7 +86,7 @@ public class Card {
             .cardImage(cardInfoResponse.getCardImage())
             .cardName(cardInfoResponse.getCardName())
             .cardType(cardInfoResponse.getCardType())
-            //.user(user)
+            .member(member)
             .build();
     }
 
@@ -97,4 +99,15 @@ public class Card {
             .cardImage(cardImage)
             .build();
     }
+
+    public void setMember(Member member) {
+        this.member = member;
+    }
+
+    public void addPayment(Payment payment) {
+        payments.add(payment);
+        payment.setCard(this);
+    }
+
+
 }

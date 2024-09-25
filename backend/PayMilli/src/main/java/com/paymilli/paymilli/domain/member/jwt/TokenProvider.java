@@ -2,6 +2,7 @@ package com.paymilli.paymilli.domain.member.jwt;
 
 import com.paymilli.paymilli.global.exception.TokenExpiredException;
 import com.paymilli.paymilli.global.exception.TokenInvalidException;
+import com.paymilli.paymilli.global.util.RedisUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -14,13 +15,11 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -36,19 +35,20 @@ public class TokenProvider implements InitializingBean {
     private final String secret;
     private final long accessTokenValidityInMilliseconds;
     private final long refreshTokenValidityInMilliseconds;
-    private final RedisTemplate<String, String> redisTemplate;
+    private final RedisUtil redisUtil;
+    //    private final RedisTemplate<String, String> redisTemplate;
     private Key key;
 
     public TokenProvider(
         @Value("${jwt.secret}") String secret,
         @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds,
-        RedisTemplate<String, String> redisTemplate) {
+        RedisTemplate<String, String> redisTemplate, RedisUtil redisUtil) {
         this.secret = secret;
         this.accessTokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
 //        this.accessTokenValidityInMilliseconds = 10;
         this.refreshTokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
+        this.redisUtil = redisUtil;
 //        this.refreshTokenValidityInMilliseconds = 10;
-        this.redisTemplate = redisTemplate;
     }
 
     @Override
@@ -74,12 +74,8 @@ public class TokenProvider implements InitializingBean {
             .setExpiration(validity)
             .compact();
 
-        redisTemplate.opsForValue().set(
-            authentication.getName(),
-            refreshToken,
-            refreshTokenValidityInMilliseconds,
-            TimeUnit.MICROSECONDS
-        );
+        redisUtil.saveDataToRedis(authentication.getName(), refreshToken,
+            refreshTokenValidityInMilliseconds);
 
         return refreshToken;
     }
@@ -160,12 +156,10 @@ public class TokenProvider implements InitializingBean {
 
 
     public String getRefreshToken(String refreshToken) {
-        ValueOperations<String, String> ops = redisTemplate.opsForValue();
-
-        return ops.get(getMemberId(refreshToken));
+        return (String) redisUtil.getDataFromRedis(refreshToken);
     }
 
     public void removeRefreshToken(String memberId) {
-        redisTemplate.delete(memberId);
+        redisUtil.removeDataFromRedis(memberId);
     }
 }
