@@ -19,6 +19,7 @@ import com.paymilli.paymilli.domain.payment.repository.PaymentGroupRepository;
 import com.paymilli.paymilli.global.util.RedisUtil;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Random;
 import java.util.UUID;
@@ -26,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
@@ -111,15 +113,21 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public SearchPaymentGroupResponse searchPaymentGroup(String token, int sort, int page, int size,
         LocalDate startDate, LocalDate endDate) {
+        log.info("page: {}, size: {}, startDate: {}, endDate: {}", page, size, startDate, endDate);
         String accessToken = tokenProvider.extractAccessToken(token);
         UUID memberId = tokenProvider.getId(accessToken);
 
         Direction dir = (sort == 0) ? Direction.DESC : Direction.ASC;
 
-        Pageable pageable = PageRequest.of(page, size, dir, "transmission_date");
+        Pageable pageable = PageRequest.of(page, size, Sort.by(dir, "transmissionDate"));
 
-        Page<PaymentGroup> paymentGroups = paymentGroupRepository.findById(memberId,
-            pageable);
+        Page<PaymentGroup> paymentGroups = paymentGroupRepository.findByMemberIdAndTransmissionDateBetween(
+            memberId,
+            startDate.atStartOfDay(), endDate.atTime(LocalTime.MAX), pageable);
+
+        for (PaymentGroup paymentGroup : paymentGroups) {
+            log.info(paymentGroup.toString());
+        }
 
         MetaResponse meta = MetaResponse.builder()
             .total_count(paymentGroups.getTotalElements())

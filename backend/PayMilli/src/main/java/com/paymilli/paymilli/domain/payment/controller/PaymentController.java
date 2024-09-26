@@ -55,11 +55,11 @@ public class PaymentController {
         @RequestParam(value = "sort", required = false, defaultValue = "0") int sort,
         @RequestParam(value = "page", required = false, defaultValue = "1") int page,
         @RequestParam(value = "size", required = false, defaultValue = "15") int size,
-        @RequestParam(value = "startDate", required = false, defaultValue = "#{T(java.time.LocalDate).MIN}") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
+        @RequestParam(value = "startDate", required = false, defaultValue = "1900-01-01") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate startDate,
         @RequestParam(value = "endDate", required = false, defaultValue = "#{T(java.time.LocalDate).now()}") @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate endDate
     ) {
         return new ResponseEntity<>(
-            paymentService.searchPaymentGroup(token, sort, page, size, startDate, endDate),
+            paymentService.searchPaymentGroup(token, sort, page - 1, size, startDate, endDate),
             HttpStatus.OK);
     }
 
