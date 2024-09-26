@@ -153,11 +153,7 @@ public class PaymentServiceImpl implements PaymentService {
         PaymentGroup paymentGroup = paymentGroupRepository.findById(UUID.fromString(paymentGroupId))
             .orElseThrow();
 
-        List<Payment> payments = paymentGroup.getPayments();
-
-        String approveNumber = payments.get(0).getApproveNumber();
-
-        return paymentGroup.makeResponse(approveNumber);
+        return paymentGroup.makeResponse();
     }
 
     @Transactional

@@ -13,6 +13,5 @@ public class PaymentGroupResponse {
     private String storeName;
     private int price;
     private LocalDateTime date;
-    private String approveNumber;
     private List<PaymentResponse> paymentResponse;
 }

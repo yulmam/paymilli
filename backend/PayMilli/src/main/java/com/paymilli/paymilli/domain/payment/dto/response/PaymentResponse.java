@@ -10,4 +10,5 @@ public class PaymentResponse {
     private String cardId;
     private String cardName;
     private int chargePrice;
+    private String approveNumber;
 }

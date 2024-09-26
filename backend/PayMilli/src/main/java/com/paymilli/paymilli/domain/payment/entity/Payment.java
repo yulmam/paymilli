@@ -88,6 +88,7 @@ public class Payment {
             .cardId(id.toString())
             .cardName(card.getCardName())
             .chargePrice(price)
+            .approveNumber(approveNumber)
             .build();
     }
 
