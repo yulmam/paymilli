@@ -100,7 +100,7 @@ public class PaymentGroup {
         this.member = member;
     }
 
-    public PaymentGroupResponse makeResponse() {
+    public PaymentGroupResponse makeResponse(String approveNumber) {
         return PaymentGroupResponse.builder()
             .id(id.toString())
             .storeName(storeName)
@@ -111,6 +111,7 @@ public class PaymentGroup {
                     .map(Payment::makeResponse)
                     .toList()
             )
+            .approveNumber(approveNumber)
             .build();
     }
 
