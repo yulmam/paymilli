@@ -9,6 +9,7 @@ import com.paymilli.paymilli.domain.payment.dto.request.ApprovePaymentRequest;
 import com.paymilli.paymilli.domain.payment.dto.request.DemandPaymentCardRequest;
 import com.paymilli.paymilli.domain.payment.dto.request.DemandPaymentRequest;
 import com.paymilli.paymilli.domain.payment.dto.request.RefundPaymentRequest;
+import com.paymilli.paymilli.domain.payment.dto.response.DemandResponse;
 import com.paymilli.paymilli.domain.payment.dto.response.MetaResponse;
 import com.paymilli.paymilli.domain.payment.dto.response.PaymentGroupResponse;
 import com.paymilli.paymilli.domain.payment.dto.response.SearchPaymentGroupResponse;
@@ -62,9 +63,19 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Transactional
     @Override
-    public String issueTransactionId(String token, DemandPaymentRequest demandPaymentRequest) {
+    public DemandResponse issueTransactionId(String token,
+        DemandPaymentRequest demandPaymentRequest) {
         String accessToken = tokenProvider.extractAccessToken(token);
         UUID memberId = tokenProvider.getId(accessToken);
+
+        //금액 검증
+        int totalPrice = demandPaymentRequest.getPaymentCards().stream()
+            .map(DemandPaymentCardRequest::getChargePrice)
+            .reduce(0, Integer::sum);
+
+        if (totalPrice != demandPaymentRequest.getTotalPrice()) {
+            throw new IllegalArgumentException("입력 값이 부정확합니다. (결제 총액 != 각 결제액 합)");
+        }
 
         //redis key
         Random random = new Random();
@@ -74,13 +85,14 @@ public class PaymentServiceImpl implements PaymentService {
 
         redisUtil.saveDataToRedis(transactionId, demandPaymentRequest, 86400 * 1000);
 
-        return transactionId;
+        return new DemandResponse(transactionId);
     }
 
     @Transactional
     @Override
     public void approvePayment(String token, String transactionId,
         ApprovePaymentRequest approvePaymentRequest) {
+
         String accessToken = tokenProvider.extractAccessToken(token);
         Member member = memberRepository.findById(tokenProvider.getId(accessToken))
             .orElseThrow();
@@ -147,6 +159,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .detail(paymentGroup.getProductName())
                 .price(paymentGroup.getTotalPrice())
                 .paymentStatus(paymentGroup.getStatus())
+                .date(paymentGroup.getTransmissionDate())
                 .build())
             .toList();
 
@@ -173,6 +186,6 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private boolean isNotSamePaymentPassword(Member member, String paymentPassword) {
-        return member.getPassword().equals(paymentPassword);
+        return !passwordEncoder.matches(paymentPassword, member.getPaymentPassword());
     }
 }

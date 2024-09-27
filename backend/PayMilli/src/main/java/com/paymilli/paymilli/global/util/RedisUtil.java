@@ -27,4 +27,8 @@ public class RedisUtil {
     public void removeDataFromRedis(String key) {
         redisTemplate.delete(key);
     }
+
+    public boolean hasKey(String key) {
+        return redisTemplate.hasKey(key);
+    }
 }
