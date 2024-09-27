@@ -38,7 +38,18 @@ public class CardServiceImpl implements CardService {
 
     @Transactional
     public void registerCard(AddCardRequest addCardRequest, UUID memberId) {
-        log.info("카드 등록 서비스");
+        Member member = memberRepository.findById(memberId).orElseThrow();
+
+        CardValidationResponse response = cardClient.validateAndGetCardInfo(
+            CardValidationRequest.builder()
+                .cardNumber(addCardRequest.getCardNumber())
+                .cvc(addCardRequest.getCvc())
+                .expirationDate(addCardRequest.getExpirationDate())
+                .cardPassword(addCardRequest.getCardPassword())
+                .userKey(member.getUserKey())
+                .build()
+        );
+
         Optional<Card> cardOpt = cardRepository.findByCardNumberAndMemberId(
             addCardRequest.getCardNumber(), memberId);
 
@@ -50,20 +61,6 @@ public class CardServiceImpl implements CardService {
             card.create();
             return;
         }
-
-        Member member = memberRepository.findById(memberId).orElseThrow();
-
-        CardValidationRequest cardValidationRequest = CardValidationRequest.builder()
-            .cardNumber(addCardRequest.getCardNumber())
-            .cvc(addCardRequest.getCvc())
-            .expirationDate(addCardRequest.getExpirationDate())
-            .cardPassword(addCardRequest.getCardPassword())
-            .userKey(member.getUserKey())
-            .build();
-
-        CardValidationResponse response = cardClient.validateAndGetCardInfo(
-           cardValidationRequest
-        );
 
         cardRepository.save(
             Card.toEntity(
@@ -86,6 +83,11 @@ public class CardServiceImpl implements CardService {
     public void deleteCard(UUID cardId, UUID memberId) {
         Card card = cardRepository.findByIdAndMemberId(cardId, memberId)
             .orElseThrow(IllegalArgumentException::new);
+
+        if(card.isDeleted()) {
+            throw new IllegalArgumentException();
+        }
+
         card.delete();
     }
 }
