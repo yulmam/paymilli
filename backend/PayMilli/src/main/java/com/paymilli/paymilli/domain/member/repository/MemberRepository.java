@@ -12,5 +12,5 @@ public interface MemberRepository extends JpaRepository<Member, UUID> {
 
     Optional<Member> findByMemberId(String memberId);
 
-    Optional<Member> findById(UUID uuid);
+    Optional<Member> findByIdAndDeleted(UUID uuid, boolean deleted);
 }

@@ -145,4 +145,16 @@ public class Member {
             .phone(phone)
             .build();
     }
+
+    public void update(AddMemberRequest addMemberRequest, String encodePassword,
+        String encodePaymentPassword, LocalDate birthday) {
+        memberId = addMemberRequest.getMemberId();
+        name = addMemberRequest.getName();
+        email = addMemberRequest.getEmail();
+        password = encodePassword;
+        this.birthday = birthday;
+        gender = addMemberRequest.getGender();
+        phone = addMemberRequest.getPhone();
+        paymentPassword = encodePaymentPassword;
+    }
 }

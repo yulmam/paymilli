@@ -57,11 +57,18 @@ public class MemberService {
         Optional<Member> memberOpt = memberRepository.findByMemberId(
             addMemberRequest.getMemberId());
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        LocalDate birthday = LocalDate.parse(addMemberRequest.getBirthday(), formatter);
+
         if (memberOpt.isPresent()) {
             Member member = memberOpt.get();
 
             if (member.isDeleted()) {
                 member.create();
+                member.update(addMemberRequest,
+                    passwordEncoder.encode(addMemberRequest.getPassword()),
+                    passwordEncoder.encode(addMemberRequest.getPaymentPassword()), birthday);
+
                 return;
             }
 
@@ -70,9 +77,6 @@ public class MemberService {
 
         CardCompLoginResponse cardCompLoginResponse = memberClient.validateAndGetUserKey(
             new CardCompLoginRequest(addMemberRequest.getEmail()));
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        LocalDate birthday = LocalDate.parse(addMemberRequest.getBirthday(), formatter);
 
         Member member = Member.toEntity(addMemberRequest, cardCompLoginResponse.getUserKey(),
             birthday, passwordEncoder.encode(addMemberRequest.getPassword()),
@@ -147,7 +151,7 @@ public class MemberService {
 
     @Transactional
     public Member getMemberById(UUID memberId) {
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdAndDeleted(memberId, false)
             .orElseThrow(() -> new MemberNotExistException("Member Not found"));
 
         if (member.isDeleted()) {
