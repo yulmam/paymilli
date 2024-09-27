@@ -4,6 +4,7 @@ import com.paymilli.paymilli.domain.member.dto.request.AddMemberRequest;
 import com.paymilli.paymilli.domain.member.dto.request.LoginRequest;
 import com.paymilli.paymilli.domain.member.dto.request.TokenRequest;
 import com.paymilli.paymilli.domain.member.dto.request.UpdatePaymentPasswordRequest;
+import com.paymilli.paymilli.domain.member.dto.request.ValidatePaymentPasswordRequest;
 import com.paymilli.paymilli.domain.member.dto.response.LoginResponse;
 import com.paymilli.paymilli.domain.member.dto.response.TokenResponse;
 import com.paymilli.paymilli.domain.member.jwt.JwtFilter;
@@ -122,6 +123,19 @@ public class MemberController {
 
         return new ResponseEntity<>(HttpStatus.OK);
     }
+
+    @PostMapping("/payment/password")
+    public ResponseEntity<?> validatePaymentPassword(@RequestHeader("Authorization") String token,
+        @RequestBody ValidatePaymentPasswordRequest validatePaymentPasswordRequest) {
+
+        String accessToken = tokenProvider.extractAccessToken(token);
+        UUID memberId = tokenProvider.getId(accessToken);
+
+        return new ResponseEntity<>(
+            memberService.validatePaymentPassword(memberId, validatePaymentPasswordRequest),
+            HttpStatus.OK);
+    }
+
 
     private Cookie generateRefreshTokenCookie(String refreshToken) {
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);

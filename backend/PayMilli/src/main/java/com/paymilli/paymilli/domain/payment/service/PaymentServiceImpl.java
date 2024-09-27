@@ -29,6 +29,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -42,16 +43,19 @@ public class PaymentServiceImpl implements PaymentService {
     private final CardRepository cardRepository;
     private final PaymentGroupRepository paymentGroupRepository;
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public PaymentServiceImpl(TokenProvider tokenProvider, RedisUtil redisUtil,
         PaymentDetailService paymentDetailService, CardRepository cardRepository,
-        PaymentGroupRepository paymentGroupRepository, MemberRepository memberRepository) {
+        PaymentGroupRepository paymentGroupRepository, MemberRepository memberRepository,
+        PasswordEncoder passwordEncoder) {
         this.tokenProvider = tokenProvider;
         this.redisUtil = redisUtil;
         this.paymentDetailService = paymentDetailService;
         this.cardRepository = cardRepository;
         this.paymentGroupRepository = paymentGroupRepository;
         this.memberRepository = memberRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -167,6 +171,6 @@ public class PaymentServiceImpl implements PaymentService {
     }
 
     private boolean isNotSamePaymentPassword(Member member, String paymentPassword) {
-        return member.getPassword().equals(paymentPassword);
+        return !passwordEncoder.matches(paymentPassword, member.getPaymentPassword());
     }
 }
