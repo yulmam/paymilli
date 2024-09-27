@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface PaymentDetailService {
 
-    boolean requestPaymentGroup(PaymentGroup paymentGroup);
+    void requestPaymentGroup(PaymentGroup paymentGroup);
 
     boolean refundPaymentGroup(PaymentGroup paymentGroup);
 

@@ -16,6 +16,8 @@ import com.paymilli.paymilli.domain.payment.dto.response.TransactionResponse;
 import com.paymilli.paymilli.domain.payment.entity.Payment;
 import com.paymilli.paymilli.domain.payment.entity.PaymentGroup;
 import com.paymilli.paymilli.domain.payment.repository.PaymentGroupRepository;
+import com.paymilli.paymilli.global.exception.BaseException;
+import com.paymilli.paymilli.global.exception.BaseResponseStatus;
 import com.paymilli.paymilli.global.util.RedisUtil;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
@@ -29,6 +31,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -42,16 +45,19 @@ public class PaymentServiceImpl implements PaymentService {
     private final CardRepository cardRepository;
     private final PaymentGroupRepository paymentGroupRepository;
     private final MemberRepository memberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public PaymentServiceImpl(TokenProvider tokenProvider, RedisUtil redisUtil,
         PaymentDetailService paymentDetailService, CardRepository cardRepository,
-        PaymentGroupRepository paymentGroupRepository, MemberRepository memberRepository) {
+        PaymentGroupRepository paymentGroupRepository, MemberRepository memberRepository,
+        PasswordEncoder passwordEncoder) {
         this.tokenProvider = tokenProvider;
         this.redisUtil = redisUtil;
         this.paymentDetailService = paymentDetailService;
         this.cardRepository = cardRepository;
         this.paymentGroupRepository = paymentGroupRepository;
         this.memberRepository = memberRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
@@ -73,14 +79,14 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Transactional
     @Override
-    public boolean approvePayment(String token, String transactionId,
+    public void approvePayment(String token, String transactionId,
         ApprovePaymentRequest approvePaymentRequest) {
         String accessToken = tokenProvider.extractAccessToken(token);
         Member member = memberRepository.findById(tokenProvider.getId(accessToken))
             .orElseThrow();
 
         if (isNotSamePaymentPassword(member, approvePaymentRequest.getPassword())) {
-            return false;
+            throw new BaseException(BaseResponseStatus.PAYMENT_ERROR);
         }
 
         //redis로 데이터 가져옴
@@ -106,7 +112,7 @@ public class PaymentServiceImpl implements PaymentService {
             member.addPaymentGroup(paymentGroup);
         }
 
-        return paymentDetailService.requestPaymentGroup(paymentGroup);
+        paymentDetailService.requestPaymentGroup(paymentGroup);
     }
 
     @Transactional

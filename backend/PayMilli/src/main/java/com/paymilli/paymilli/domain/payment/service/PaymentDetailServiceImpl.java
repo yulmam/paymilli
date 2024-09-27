@@ -12,6 +12,9 @@ import com.paymilli.paymilli.domain.payment.exception.PaymentCardException;
 import com.paymilli.paymilli.domain.payment.exception.PaymentMilliException;
 import com.paymilli.paymilli.domain.payment.repository.PaymentGroupRepository;
 import com.paymilli.paymilli.domain.payment.repository.PaymentRepository;
+import com.paymilli.paymilli.global.exception.BaseException;
+import com.paymilli.paymilli.global.exception.BaseResponseStatus;
+
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -28,54 +31,42 @@ public class PaymentDetailServiceImpl implements PaymentDetailService {
 
     @Transactional
     @Override
-    public boolean requestPaymentGroup(PaymentGroup paymentGroup) {
-
-        // 결제 성공 유무
-        boolean paymentSuccess = true;
+    public void requestPaymentGroup(PaymentGroup paymentGroup) {
 
         int paymentIdx = 0;
-        int paymentGroupSize = paymentGroup.getPayments().size();
-        String[] approveNumbers = new String[paymentGroupSize];
+        String[] approveNumbers = new String[paymentGroup.getPayments().size()];
 
-        log.info("size:" + paymentGroupSize);
+        paymentGroupRepository.save(paymentGroup);
 
         try {
             // 순서대로 결제 진행
-            for (; paymentIdx < paymentGroupSize; paymentIdx++) {
-                // 결제승인 코드 저장
-                approveNumbers[paymentIdx] = requestSinglePayment(
+            for (; paymentIdx < paymentGroup.getPayments().size(); paymentIdx++) {
+
+                Payment payment = paymentGroup.getPayments().get(paymentIdx);
+
+                // 결제
+                String approveNumber = requestSinglePayment(
                     paymentGroup.getPayments().get(paymentIdx), paymentGroup.getStoreName());
 
-                log.info(approveNumbers[paymentIdx]);
+                // 승인 번호 저장
+                payment.setApproveNumber(approveNumber);
+                approveNumbers[paymentIdx] = approveNumber;
+
+                paymentRepository.save(payment);
             }
+
+            // 성공시 결제 내역 DB 저장
+            paymentGroup.setStatus(PaymentStatus.PAYMENT);
+
         } catch (PaymentMilliException e) {
-            paymentSuccess = false;
 
             // 이전 내역 환불 처리
             for (int i = 0; i < paymentIdx; i++) {
                 requestSingleRefund(approveNumbers[i]);
             }
 
-        } finally {
-            log.info("paymentSuccess : " + paymentSuccess);
-
-            // 성공시 결제 내역 DB 저장
-            if (paymentSuccess) {
-                paymentGroup.setStatus(PaymentStatus.PAYMENT);
-                paymentGroupRepository.save(paymentGroup);
-
-                for (int i = 0; i < paymentGroupSize; i++) {
-                    Payment payment = paymentGroup.getPayments().get(i);
-
-                    log.info("approveNumber " + i + " : " + approveNumbers[i]);
-                    // 결제 승인번호 주입
-                    payment.setApproveNumber(approveNumbers[i]);
-                    paymentRepository.save(payment);
-                }
-            }
+            throw new BaseException(BaseResponseStatus.PAYMENT_ERROR);
         }
-
-        return paymentSuccess;
     }
 
     private String requestSinglePayment(Payment payment, String storeName)
