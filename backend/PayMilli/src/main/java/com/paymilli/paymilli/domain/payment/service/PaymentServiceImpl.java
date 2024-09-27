@@ -159,6 +159,7 @@ public class PaymentServiceImpl implements PaymentService {
                 .detail(paymentGroup.getProductName())
                 .price(paymentGroup.getTotalPrice())
                 .paymentStatus(paymentGroup.getStatus())
+                .date(paymentGroup.getTransmissionDate())
                 .build())
             .toList();
 
