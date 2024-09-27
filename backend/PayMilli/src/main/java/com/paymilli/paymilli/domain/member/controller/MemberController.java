@@ -114,12 +114,13 @@ public class MemberController {
 
     @PutMapping("/payment/password")
     public ResponseEntity<?> updateMember(@RequestHeader("Authorization") String token,
+        @RequestHeader("sequence") String sequenceId,
         @RequestBody UpdatePaymentPasswordRequest updatePaymentPasswordRequest) {
 
         String accessToken = tokenProvider.extractAccessToken(token);
         UUID memberId = tokenProvider.getId(accessToken);
 
-        memberService.updatePaymentPassword(memberId, updatePaymentPasswordRequest);
+        memberService.updatePaymentPassword(memberId, sequenceId, updatePaymentPasswordRequest);
 
         return new ResponseEntity<>(HttpStatus.OK);
     }

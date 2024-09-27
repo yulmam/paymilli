@@ -123,11 +123,18 @@ public class MemberService {
 
     @Transactional
     public void updatePaymentPassword(UUID memberId,
+        String sequenceId,
         UpdatePaymentPasswordRequest updatePaymentPasswordRequest) {
         Member member = getMemberById(memberId);
 
+        if (!redisUtil.hasKey(sequenceId)) {
+            throw new IllegalArgumentException("적절하지 않는 수정 과정입니다. 결제 비밀번호 인증을 먼저 해주세요.");
+        }
+
         member.setPaymentPassword(
             passwordEncoder.encode(updatePaymentPasswordRequest.getPaymentPassword()));
+
+        redisUtil.removeDataFromRedis(sequenceId);
     }
 
     @Transactional

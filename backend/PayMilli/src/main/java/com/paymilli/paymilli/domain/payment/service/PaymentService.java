@@ -11,7 +11,7 @@ public interface PaymentService {
 
     String issueTransactionId(String token, DemandPaymentRequest demandPaymentRequest);
 
-    boolean approvePayment(String token, String transactionId,
+    boolean approvePayment(String token, String transactionId, String sequenceId,
         ApprovePaymentRequest approvePaymentRequest);
 
     SearchPaymentGroupResponse searchPaymentGroup(String token, int sort, int page, int size,
