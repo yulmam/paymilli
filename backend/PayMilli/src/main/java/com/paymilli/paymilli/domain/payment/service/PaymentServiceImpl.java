@@ -9,6 +9,7 @@ import com.paymilli.paymilli.domain.payment.dto.request.ApprovePaymentRequest;
 import com.paymilli.paymilli.domain.payment.dto.request.DemandPaymentCardRequest;
 import com.paymilli.paymilli.domain.payment.dto.request.DemandPaymentRequest;
 import com.paymilli.paymilli.domain.payment.dto.request.RefundPaymentRequest;
+import com.paymilli.paymilli.domain.payment.dto.response.DemandResponse;
 import com.paymilli.paymilli.domain.payment.dto.response.MetaResponse;
 import com.paymilli.paymilli.domain.payment.dto.response.PaymentGroupResponse;
 import com.paymilli.paymilli.domain.payment.dto.response.SearchPaymentGroupResponse;
@@ -60,7 +61,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Transactional
     @Override
-    public String issueTransactionId(String token, DemandPaymentRequest demandPaymentRequest) {
+    public DemandResponse issueTransactionId(String token,
+        DemandPaymentRequest demandPaymentRequest) {
         String accessToken = tokenProvider.extractAccessToken(token);
         UUID memberId = tokenProvider.getId(accessToken);
 
@@ -81,7 +83,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         redisUtil.saveDataToRedis(transactionId, demandPaymentRequest, 86400 * 1000);
 
-        return transactionId;
+        return new DemandResponse(transactionId);
     }
 
     @Transactional

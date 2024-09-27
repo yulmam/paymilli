@@ -3,13 +3,14 @@ package com.paymilli.paymilli.domain.payment.service;
 import com.paymilli.paymilli.domain.payment.dto.request.ApprovePaymentRequest;
 import com.paymilli.paymilli.domain.payment.dto.request.DemandPaymentRequest;
 import com.paymilli.paymilli.domain.payment.dto.request.RefundPaymentRequest;
+import com.paymilli.paymilli.domain.payment.dto.response.DemandResponse;
 import com.paymilli.paymilli.domain.payment.dto.response.PaymentGroupResponse;
 import com.paymilli.paymilli.domain.payment.dto.response.SearchPaymentGroupResponse;
 import java.time.LocalDate;
 
 public interface PaymentService {
 
-    String issueTransactionId(String token, DemandPaymentRequest demandPaymentRequest);
+    DemandResponse issueTransactionId(String token, DemandPaymentRequest demandPaymentRequest);
 
     boolean approvePayment(String token, String transactionId,
         ApprovePaymentRequest approvePaymentRequest);
