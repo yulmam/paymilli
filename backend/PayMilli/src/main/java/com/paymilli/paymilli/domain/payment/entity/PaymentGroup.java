@@ -85,7 +85,7 @@ public class PaymentGroup {
 
     public static PaymentGroup toEntity(DemandPaymentRequest demandPaymentRequest) {
         return PaymentGroup.builder()
-            .totalPrice(demandPaymentRequest.getPrice())
+            .totalPrice(demandPaymentRequest.getTotalPrice())
             .transmissionDate(LocalDateTime.now())
             .storeName(demandPaymentRequest.getStoreName())
             .productName(demandPaymentRequest.getDetail())

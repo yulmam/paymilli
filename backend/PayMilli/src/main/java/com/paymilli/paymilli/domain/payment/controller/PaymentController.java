@@ -40,9 +40,11 @@ public class PaymentController {
     public ResponseEntity<?> approvePayment(
         @RequestHeader("Authorization") String token,
         @RequestHeader("transactionId") String transactionId,
+        @RequestHeader("paymentPasswordToken") String paymentPasswordToken,
         @RequestBody ApprovePaymentRequest approvePaymentRequest) {
 
-        if (paymentService.approvePayment(token, transactionId, approvePaymentRequest)) {
+        if (paymentService.approvePayment(token, transactionId, paymentPasswordToken,
+            approvePaymentRequest)) {
             return new ResponseEntity<>("결제가 정상처리 되었습니다.", HttpStatus.OK);
         }
 

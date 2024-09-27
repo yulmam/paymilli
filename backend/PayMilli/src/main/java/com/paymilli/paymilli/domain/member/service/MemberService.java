@@ -6,16 +6,20 @@ import com.paymilli.paymilli.domain.member.dto.client.CardCompLoginResponse;
 import com.paymilli.paymilli.domain.member.dto.request.AddMemberRequest;
 import com.paymilli.paymilli.domain.member.dto.request.TokenRequest;
 import com.paymilli.paymilli.domain.member.dto.request.UpdatePaymentPasswordRequest;
+import com.paymilli.paymilli.domain.member.dto.request.ValidatePaymentPasswordRequest;
 import com.paymilli.paymilli.domain.member.dto.response.MemberInfoResponse;
 import com.paymilli.paymilli.domain.member.dto.response.TokenResponse;
+import com.paymilli.paymilli.domain.member.dto.response.ValidatePaymentPasswordResponse;
 import com.paymilli.paymilli.domain.member.entity.Member;
 import com.paymilli.paymilli.domain.member.exception.MemberNotExistException;
 import com.paymilli.paymilli.domain.member.jwt.TokenProvider;
 import com.paymilli.paymilli.domain.member.repository.MemberRepository;
+import com.paymilli.paymilli.global.util.RedisUtil;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Optional;
+import java.util.Random;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -34,15 +38,18 @@ public class MemberService {
     private final TokenProvider tokenProvider;
     private final MemberClient memberClient;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    private final RedisUtil redisUtil;
 
     public MemberService(MemberRepository memberRepository, PasswordEncoder passwordEncoder,
         TokenProvider tokenProvider,
-        MemberClient memberClient, AuthenticationManagerBuilder authenticationManagerBuilder) {
+        MemberClient memberClient, AuthenticationManagerBuilder authenticationManagerBuilder,
+        RedisUtil redisUtil) {
         this.memberRepository = memberRepository;
         this.passwordEncoder = passwordEncoder;
         this.tokenProvider = tokenProvider;
         this.memberClient = memberClient;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
+        this.redisUtil = redisUtil;
     }
 
     @Transactional
@@ -50,11 +57,18 @@ public class MemberService {
         Optional<Member> memberOpt = memberRepository.findByMemberId(
             addMemberRequest.getMemberId());
 
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
+        LocalDate birthday = LocalDate.parse(addMemberRequest.getBirthday(), formatter);
+
         if (memberOpt.isPresent()) {
             Member member = memberOpt.get();
 
             if (member.isDeleted()) {
                 member.create();
+                member.update(addMemberRequest,
+                    passwordEncoder.encode(addMemberRequest.getPassword()),
+                    passwordEncoder.encode(addMemberRequest.getPaymentPassword()), birthday);
+
                 return;
             }
 
@@ -63,9 +77,6 @@ public class MemberService {
 
         CardCompLoginResponse cardCompLoginResponse = memberClient.validateAndGetUserKey(
             new CardCompLoginRequest(addMemberRequest.getEmail()));
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMdd");
-        LocalDate birthday = LocalDate.parse(addMemberRequest.getBirthday(), formatter);
 
         Member member = Member.toEntity(addMemberRequest, cardCompLoginResponse.getUserKey(),
             birthday, passwordEncoder.encode(addMemberRequest.getPassword()),
@@ -116,11 +127,18 @@ public class MemberService {
 
     @Transactional
     public void updatePaymentPassword(UUID memberId,
+        String paymentPasswordToken,
         UpdatePaymentPasswordRequest updatePaymentPasswordRequest) {
         Member member = getMemberById(memberId);
 
+        if (!redisUtil.hasKey(paymentPasswordToken)) {
+            throw new IllegalArgumentException("적절하지 않는 수정 과정입니다. 결제 비밀번호 인증을 먼저 해주세요.");
+        }
+
         member.setPaymentPassword(
             passwordEncoder.encode(updatePaymentPasswordRequest.getPaymentPassword()));
+
+        redisUtil.removeDataFromRedis(paymentPasswordToken);
     }
 
     @Transactional
@@ -133,7 +151,7 @@ public class MemberService {
 
     @Transactional
     public Member getMemberById(UUID memberId) {
-        Member member = memberRepository.findById(memberId)
+        Member member = memberRepository.findByIdAndDeleted(memberId, false)
             .orElseThrow(() -> new MemberNotExistException("Member Not found"));
 
         if (member.isDeleted()) {
@@ -141,5 +159,32 @@ public class MemberService {
         }
 
         return member;
+    }
+
+    @Transactional
+    public ValidatePaymentPasswordResponse validatePaymentPassword(UUID memberId,
+        ValidatePaymentPasswordRequest validatePaymentPasswordRequest) {
+
+        Optional<Member> memberOpt = memberRepository.findById(memberId);
+
+        log.info(validatePaymentPasswordRequest.getPaymentPassword());
+        if (memberOpt.isEmpty() || !isEqualPassword(memberOpt.get().getPaymentPassword(),
+            validatePaymentPasswordRequest.getPaymentPassword())) {
+            throw new IllegalArgumentException();
+        }
+
+        //redis 키 생성
+        Random random = new Random();
+        int randomNumber = 100000 + random.nextInt(900000); // 6자리 난수 생성 (100000 ~ 999999)
+
+        String paymentPasswordToken = memberId + "-sequence-" + randomNumber;
+
+        redisUtil.saveDataToRedis(paymentPasswordToken, 1, 300 * 1000);
+
+        return new ValidatePaymentPasswordResponse(paymentPasswordToken);
+    }
+
+    public boolean isEqualPassword(String password, String input) {
+        return passwordEncoder.matches(input, password);
     }
 }
