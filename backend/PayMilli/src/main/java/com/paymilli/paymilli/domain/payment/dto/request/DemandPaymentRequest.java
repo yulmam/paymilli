@@ -10,7 +10,7 @@ import lombok.ToString;
 public class DemandPaymentRequest implements Serializable {
 
     private String storeName;
-    private int price;
+    private int totalPrice;
     private String detail;
     private List<DemandPaymentCardRequest> paymentCards;
 }

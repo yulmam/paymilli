@@ -64,6 +64,15 @@ public class PaymentServiceImpl implements PaymentService {
         String accessToken = tokenProvider.extractAccessToken(token);
         UUID memberId = tokenProvider.getId(accessToken);
 
+        //금액 검증
+        int totalPrice = demandPaymentRequest.getPaymentCards().stream()
+            .map(DemandPaymentCardRequest::getChargePrice)
+            .reduce(0, Integer::sum);
+
+        if (totalPrice != demandPaymentRequest.getTotalPrice()) {
+            throw new IllegalArgumentException("입력 값이 부정확합니다. (결제 총액 != 각 결제액 합)");
+        }
+
         //redis key
         Random random = new Random();
         int randomNumber = 100000 + random.nextInt(900000); // 6자리 난수 생성 (100000 ~ 999999)
