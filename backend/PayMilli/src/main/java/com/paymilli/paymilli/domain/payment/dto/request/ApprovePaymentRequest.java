@@ -8,4 +8,8 @@ import lombok.NoArgsConstructor;
 public class ApprovePaymentRequest {
 
     private String password;
+
+    public ApprovePaymentRequest(int password) {
+        this.password = String.valueOf(password);
+    }
 }
