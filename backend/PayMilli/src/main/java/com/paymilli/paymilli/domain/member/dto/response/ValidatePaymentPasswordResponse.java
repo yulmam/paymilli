@@ -7,5 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ValidatePaymentPasswordResponse {
 
-    private String sequence;
+    private String paymentPasswordToken;
 }

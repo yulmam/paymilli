@@ -86,9 +86,9 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Transactional
     @Override
-    public boolean approvePayment(String token, String transactionId, String sequenceId,
+    public boolean approvePayment(String token, String transactionId, String paymentPasswordToken,
         ApprovePaymentRequest approvePaymentRequest) {
-        if (!redisUtil.hasKey(sequenceId)) {
+        if (!redisUtil.hasKey(paymentPasswordToken)) {
             log.info("결제 비번 인증 안함");
             return false;
         }

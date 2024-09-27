@@ -127,18 +127,18 @@ public class MemberService {
 
     @Transactional
     public void updatePaymentPassword(UUID memberId,
-        String sequenceId,
+        String paymentPasswordToken,
         UpdatePaymentPasswordRequest updatePaymentPasswordRequest) {
         Member member = getMemberById(memberId);
 
-        if (!redisUtil.hasKey(sequenceId)) {
+        if (!redisUtil.hasKey(paymentPasswordToken)) {
             throw new IllegalArgumentException("적절하지 않는 수정 과정입니다. 결제 비밀번호 인증을 먼저 해주세요.");
         }
 
         member.setPaymentPassword(
             passwordEncoder.encode(updatePaymentPasswordRequest.getPaymentPassword()));
 
-        redisUtil.removeDataFromRedis(sequenceId);
+        redisUtil.removeDataFromRedis(paymentPasswordToken);
     }
 
     @Transactional
@@ -177,11 +177,11 @@ public class MemberService {
         Random random = new Random();
         int randomNumber = 100000 + random.nextInt(900000); // 6자리 난수 생성 (100000 ~ 999999)
 
-        String sequence = memberId + "-sequence-" + randomNumber;
+        String paymentPasswordToken = memberId + "-sequence-" + randomNumber;
 
-        redisUtil.saveDataToRedis(sequence, 1, 300 * 1000);
+        redisUtil.saveDataToRedis(paymentPasswordToken, 1, 300 * 1000);
 
-        return new ValidatePaymentPasswordResponse(sequence);
+        return new ValidatePaymentPasswordResponse(paymentPasswordToken);
     }
 
     public boolean isEqualPassword(String password, String input) {
