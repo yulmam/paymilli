@@ -9,6 +9,8 @@ import com.paymilli.paymilli.domain.card.entity.Card;
 import com.paymilli.paymilli.domain.card.repository.CardRepository;
 import com.paymilli.paymilli.domain.member.entity.Member;
 import com.paymilli.paymilli.domain.member.repository.MemberRepository;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -69,10 +71,25 @@ public class CardServiceImpl implements CardService {
 
     @Transactional
     public List<CardResponse> searchCards(UUID memberId) {
-        return cardRepository.findByMemberId(memberId).stream()
+        List<Card> cards = cardRepository.findByMemberId(memberId);
+        Card mainCard = memberRepository.findById(memberId).orElseThrow().getMainCard();
+
+        //mainCard를 list에서 찾기
+        int mainCardIdx = cards.indexOf(mainCard);
+
+        if(mainCardIdx == -1){
+            throw new IllegalArgumentException();
+        }
+
+        List<CardResponse> cardResponses = cards.stream()
             .filter(card -> !card.isDeleted())
             .map(Card::makeResponse)
-            .collect(Collectors.toList());
+            .toList();
+
+        //메인 카드를 제일 앞으로
+        Collections.swap(cardResponses, 0, mainCardIdx);
+
+        return cardResponses;
     }
 
     @Transactional
