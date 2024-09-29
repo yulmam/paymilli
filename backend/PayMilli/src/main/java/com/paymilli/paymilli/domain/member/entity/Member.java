@@ -80,7 +80,7 @@ public class Member {
 
     //    card 개발시 제거 예정
     @OneToOne
-    @JoinColumn
+    @JoinColumn(name = "main_card_id")
     private Card mainCard;
 
     @Column
@@ -128,8 +128,13 @@ public class Member {
         this.paymentPassword = paymentPassword;
     }
 
+    public void setMainCard(Card mainCard){
+        this.mainCard = mainCard;
+    }
+
     public void delete() {
         deleted = true;
+        mainCard = null;
     }
 
     public void create() {

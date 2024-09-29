@@ -12,4 +12,6 @@ public interface CardService {
     List<CardResponse> searchCards(UUID userId);
 
     void deleteCard(UUID cardId, UUID userId);
+
+    void changeMainCard(UUID cardId, UUID userId);
 }

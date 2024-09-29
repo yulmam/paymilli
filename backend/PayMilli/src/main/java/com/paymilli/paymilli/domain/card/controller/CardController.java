@@ -2,6 +2,7 @@ package com.paymilli.paymilli.domain.card.controller;
 
 
 import com.paymilli.paymilli.domain.card.dto.request.AddCardRequest;
+import com.paymilli.paymilli.domain.card.dto.request.ChangeMainCardRequest;
 import com.paymilli.paymilli.domain.card.dto.request.DeleteCardRequest;
 import com.paymilli.paymilli.domain.card.dto.response.CardResponse;
 import com.paymilli.paymilli.domain.card.service.CardService;
@@ -13,6 +14,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,7 +36,6 @@ public class CardController {
     public ResponseEntity<?> registerCard(
         @RequestHeader("Authorization") String token,
         @RequestBody AddCardRequest addCardRequest) {
-        //userId 수정 필요
         String accessToken = tokenProvider.extractAccessToken(token);
         UUID memberId = tokenProvider.getId(accessToken);
 
@@ -47,11 +48,23 @@ public class CardController {
     @GetMapping
     public ResponseEntity<List<CardResponse>> searchCards(
         @RequestHeader("Authorization") String token) {
-        //userId 수정 필요
         String accessToken = tokenProvider.extractAccessToken(token);
         UUID memberId = tokenProvider.getId(accessToken);
+
         return new ResponseEntity<>(cardService.searchCards(memberId), HttpStatus.OK);
     }
+
+
+    @PutMapping("/maincard")
+    public ResponseEntity<?> changeMainCard(@RequestHeader("Authorization") String token, @RequestBody ChangeMainCardRequest request){
+        String accessToken = tokenProvider.extractAccessToken(token);
+        UUID memberId = tokenProvider.getId(accessToken);
+
+        cardService.changeMainCard(request.getCardId(), memberId);
+
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
+
 
     @DeleteMapping
     public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token,
