@@ -10,6 +10,9 @@ import com.paymilli.paymilli.domain.member.dto.response.TokenResponse;
 import com.paymilli.paymilli.domain.member.jwt.JwtFilter;
 import com.paymilli.paymilli.domain.member.jwt.TokenProvider;
 import com.paymilli.paymilli.domain.member.service.MemberService;
+import com.paymilli.paymilli.global.exception.BaseResponse;
+import com.paymilli.paymilli.global.exception.BaseResponseStatus;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
@@ -39,10 +42,11 @@ public class MemberController {
 
 
     @PostMapping("/join")
-    public ResponseEntity<?> addMember(@RequestBody AddMemberRequest addMemberRequest) {
+    public ResponseEntity<BaseResponse<Void>> addMember(@RequestBody AddMemberRequest addMemberRequest) {
+
         memberService.addMember(addMemberRequest);
 
-        return new ResponseEntity<>("정상적으로 가입되었습니다.", HttpStatus.OK);
+        return ResponseEntity.ok(new BaseResponse<>(BaseResponseStatus.SUCCESS_MEMBER_CREATED));
     }
 
     @PostMapping("/login")

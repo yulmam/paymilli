@@ -17,6 +17,8 @@ import com.paymilli.paymilli.domain.payment.dto.response.TransactionResponse;
 import com.paymilli.paymilli.domain.payment.entity.Payment;
 import com.paymilli.paymilli.domain.payment.entity.PaymentGroup;
 import com.paymilli.paymilli.domain.payment.repository.PaymentGroupRepository;
+import com.paymilli.paymilli.global.exception.BaseException;
+import com.paymilli.paymilli.global.exception.BaseResponseStatus;
 import com.paymilli.paymilli.global.util.RedisUtil;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
@@ -88,7 +90,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Transactional
     @Override
-    public boolean approvePayment(String token, String transactionId,
+    public void approvePayment(String token, String transactionId,
         ApprovePaymentRequest approvePaymentRequest) {
 
         String accessToken = tokenProvider.extractAccessToken(token);
@@ -96,7 +98,7 @@ public class PaymentServiceImpl implements PaymentService {
             .orElseThrow();
 
         if (isNotSamePaymentPassword(member, approvePaymentRequest.getPassword())) {
-            return false;
+            throw new BaseException(BaseResponseStatus.PAYMENT_ERROR);
         }
 
         //redis로 데이터 가져옴
@@ -122,7 +124,7 @@ public class PaymentServiceImpl implements PaymentService {
             member.addPaymentGroup(paymentGroup);
         }
 
-        return paymentDetailService.requestPaymentGroup(paymentGroup);
+        paymentDetailService.requestPaymentGroup(paymentGroup);
     }
 
     @Transactional

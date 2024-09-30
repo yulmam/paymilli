@@ -15,6 +15,9 @@ import com.paymilli.paymilli.domain.member.exception.MemberNotExistException;
 import com.paymilli.paymilli.domain.member.jwt.TokenProvider;
 import com.paymilli.paymilli.domain.member.repository.MemberRepository;
 import com.paymilli.paymilli.global.util.RedisUtil;
+import com.paymilli.paymilli.global.exception.BaseException;
+import com.paymilli.paymilli.global.exception.BaseResponseStatus;
+
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -72,7 +75,7 @@ public class MemberService {
                 return;
             }
 
-            throw new RuntimeException("이미 가입되어 있는 사용자 입니다.");
+            throw new BaseException(BaseResponseStatus.MEMBER_ALREADY_EXIST);
         }
 
         CardCompLoginResponse cardCompLoginResponse = memberClient.validateAndGetUserKey(

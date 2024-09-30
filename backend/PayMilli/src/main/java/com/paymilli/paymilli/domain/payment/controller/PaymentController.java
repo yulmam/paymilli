@@ -3,7 +3,11 @@ package com.paymilli.paymilli.domain.payment.controller;
 import com.paymilli.paymilli.domain.payment.dto.request.ApprovePaymentRequest;
 import com.paymilli.paymilli.domain.payment.dto.request.DemandPaymentRequest;
 import com.paymilli.paymilli.domain.payment.dto.request.RefundPaymentRequest;
+import com.paymilli.paymilli.domain.payment.dto.response.DemandResponse;
 import com.paymilli.paymilli.domain.payment.service.PaymentService;
+import com.paymilli.paymilli.global.exception.BaseResponse;
+import com.paymilli.paymilli.global.exception.BaseResponseStatus;
+
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,24 +33,24 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping("/demand")
-    public ResponseEntity<?> demandPayment(
+    public ResponseEntity<BaseResponse<DemandResponse>> demandPayment(
         @RequestHeader("Authorization") String token,
         @RequestBody DemandPaymentRequest demandPaymentRequest) {
-        return new ResponseEntity<>(paymentService.issueTransactionId(token, demandPaymentRequest),
-            HttpStatus.OK);
+
+        return ResponseEntity.ok(new BaseResponse<>(
+            new DemandResponse(paymentService.issueTransactionId(token, demandPaymentRequest)
+        )));
     }
 
     @PostMapping("/approve")
-    public ResponseEntity<?> approvePayment(
+    public ResponseEntity<BaseResponse<Void>> approvePayment(
         @RequestHeader("Authorization") String token,
         @RequestHeader("transactionId") String transactionId,
         @RequestBody ApprovePaymentRequest approvePaymentRequest) {
 
-        if (paymentService.approvePayment(token, transactionId, approvePaymentRequest)) {
-            return new ResponseEntity<>("결제가 정상처리 되었습니다.", HttpStatus.OK);
-        }
+        paymentService.approvePayment(token, transactionId, approvePaymentRequest);
 
-        return new ResponseEntity<>("결제 오류가 발생하였습니다.", HttpStatus.NOT_FOUND);
+        return ResponseEntity.ok(new BaseResponse<>(BaseResponseStatus.SUCCESS_PAYMENT));
     }
 
     @GetMapping
