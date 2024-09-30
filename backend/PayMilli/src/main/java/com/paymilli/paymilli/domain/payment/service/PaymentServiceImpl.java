@@ -130,11 +130,12 @@ public class PaymentServiceImpl implements PaymentService {
         Random random = new Random();
         int randomNumber = 100000 + random.nextInt(900000); // 6자리 난수 생성 (100000 ~ 999999)
 
-        String refundKey = member.getId() + "-refund-" + randomNumber;
+        String refundToken = member.getId() + "-refund-" + randomNumber;
 
-        redisUtil.saveDataToRedis(refundKey, paymentGroup.getId(), 300 * 1000);
+        redisUtil.saveDataToRedis(refundToken, paymentGroup.getId(), 300 * 1000);
 
-        return new ApproveResponse(refundKey);
+        return new ApproveResponse(paymentGroup.getStoreName(), paymentGroup.getTotalPrice(),
+            paymentGroup.getProductName(), refundToken);
     }
 
     @Transactional
@@ -188,10 +189,10 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     @Override
     public boolean refundPayment(RefundPaymentRequest refundPaymentRequest) {
-        log.info("uuid: " + refundPaymentRequest.getRefundKey());
+        log.info("uuid: " + refundPaymentRequest.getRefundToken());
 
         UUID paymentGroupId = UUID.fromString((String) redisUtil.getDataFromRedis(
-            refundPaymentRequest.getRefundKey()));
+            refundPaymentRequest.getRefundToken()));
 
         PaymentGroup paymentGroup = paymentGroupRepository.findById(
             paymentGroupId).orElseThrow();
