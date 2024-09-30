@@ -7,7 +7,6 @@ import com.paymilli.paymilli.domain.payment.dto.response.DemandResponse;
 import com.paymilli.paymilli.domain.payment.service.PaymentService;
 import com.paymilli.paymilli.global.exception.BaseResponse;
 import com.paymilli.paymilli.global.exception.BaseResponseStatus;
-
 import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,8 +37,8 @@ public class PaymentController {
         @RequestBody DemandPaymentRequest demandPaymentRequest) {
 
         return ResponseEntity.ok(new BaseResponse<>(
-            new DemandResponse(paymentService.issueTransactionId(token, demandPaymentRequest)
-        )));
+            paymentService.issueTransactionId(token, demandPaymentRequest)
+        ));
     }
 
     @PostMapping("/approve")
