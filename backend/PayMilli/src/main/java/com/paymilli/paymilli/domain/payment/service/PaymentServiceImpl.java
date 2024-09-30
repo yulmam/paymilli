@@ -9,6 +9,7 @@ import com.paymilli.paymilli.domain.payment.dto.request.ApprovePaymentRequest;
 import com.paymilli.paymilli.domain.payment.dto.request.DemandPaymentCardRequest;
 import com.paymilli.paymilli.domain.payment.dto.request.DemandPaymentRequest;
 import com.paymilli.paymilli.domain.payment.dto.request.RefundPaymentRequest;
+import com.paymilli.paymilli.domain.payment.dto.response.ApproveResponse;
 import com.paymilli.paymilli.domain.payment.dto.response.DemandResponse;
 import com.paymilli.paymilli.domain.payment.dto.response.MetaResponse;
 import com.paymilli.paymilli.domain.payment.dto.response.PaymentGroupResponse;
@@ -90,7 +91,7 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Transactional
     @Override
-    public void approvePayment(String token, String transactionId,
+    public ApproveResponse approvePayment(String token, String transactionId,
         ApprovePaymentRequest approvePaymentRequest) {
 
         String accessToken = tokenProvider.extractAccessToken(token);
@@ -125,6 +126,15 @@ public class PaymentServiceImpl implements PaymentService {
         }
 
         paymentDetailService.requestPaymentGroup(paymentGroup);
+
+        Random random = new Random();
+        int randomNumber = 100000 + random.nextInt(900000); // 6자리 난수 생성 (100000 ~ 999999)
+
+        String refundKey = member.getId() + "-refund-" + randomNumber;
+
+        redisUtil.saveDataToRedis(refundKey, paymentGroup.getId(), 300 * 1000);
+
+        return new ApproveResponse(refundKey);
     }
 
     @Transactional
@@ -178,9 +188,13 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     @Override
     public boolean refundPayment(RefundPaymentRequest refundPaymentRequest) {
-        log.info("uuid: " + refundPaymentRequest.getPaymentId());
+        log.info("uuid: " + refundPaymentRequest.getRefundKey());
+
+        UUID paymentGroupId = UUID.fromString((String) redisUtil.getDataFromRedis(
+            refundPaymentRequest.getRefundKey()));
+
         PaymentGroup paymentGroup = paymentGroupRepository.findById(
-            refundPaymentRequest.getPaymentId()).orElseThrow();
+            paymentGroupId).orElseThrow();
 
         return paymentDetailService.refundPaymentGroup(paymentGroup);
     }
