@@ -4,6 +4,7 @@ package com.paymilli.paymilli.domain.card.controller;
 import com.paymilli.paymilli.domain.card.dto.request.AddCardRequest;
 import com.paymilli.paymilli.domain.card.dto.request.ChangeMainCardRequest;
 import com.paymilli.paymilli.domain.card.dto.request.DeleteCardRequest;
+import com.paymilli.paymilli.domain.card.dto.response.CardListResponse;
 import com.paymilli.paymilli.domain.card.dto.response.CardResponse;
 import com.paymilli.paymilli.domain.card.service.CardService;
 import com.paymilli.paymilli.domain.member.jwt.TokenProvider;
@@ -46,7 +47,7 @@ public class CardController {
 
 
     @GetMapping
-    public ResponseEntity<List<CardResponse>> searchCards(
+    public ResponseEntity<CardListResponse> searchCards(
         @RequestHeader("Authorization") String token) {
         String accessToken = tokenProvider.extractAccessToken(token);
         UUID memberId = tokenProvider.getId(accessToken);

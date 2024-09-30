@@ -4,6 +4,7 @@ import com.paymilli.paymilli.domain.card.client.CardClient;
 import com.paymilli.paymilli.domain.card.dto.client.CardValidationRequest;
 import com.paymilli.paymilli.domain.card.dto.client.CardValidationResponse;
 import com.paymilli.paymilli.domain.card.dto.request.AddCardRequest;
+import com.paymilli.paymilli.domain.card.dto.response.CardListResponse;
 import com.paymilli.paymilli.domain.card.dto.response.CardResponse;
 import com.paymilli.paymilli.domain.card.entity.Card;
 import com.paymilli.paymilli.domain.card.repository.CardRepository;
@@ -70,7 +71,7 @@ public class CardServiceImpl implements CardService {
     }
 
     @Transactional
-    public List<CardResponse> searchCards(UUID memberId) {
+    public CardListResponse searchCards(UUID memberId) {
         List<Card> cards = cardRepository.findByMemberId(memberId);
         Card mainCard = memberRepository.findById(memberId).orElseThrow().getMainCard();
 
@@ -84,12 +85,13 @@ public class CardServiceImpl implements CardService {
         List<CardResponse> cardResponses = cards.stream()
             .filter(card -> !card.isDeleted())
             .map(Card::makeResponse)
-            .toList();
+            .collect(Collectors.toList());
 
         //메인 카드를 제일 앞으로
-        Collections.swap(cardResponses, 0, mainCardIdx);
+        if(mainCardIdx != 0)
+            Collections.swap(cardResponses, 0, mainCardIdx);
 
-        return cardResponses;
+        return new CardListResponse(mainCard.getId(), cardResponses);
     }
 
     @Transactional
