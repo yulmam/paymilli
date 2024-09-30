@@ -12,7 +12,7 @@ public enum BaseResponseStatus {
      */
     SUCCESS(200, "요청에 성공하였습니다."),
     SUCCESS_PAYMENT(200, "결제가 정상처리 되었습니다."),
-    SUCCESS_MEMBER_CREATED(404, "정상적으로 가입되었습니다"),
+    SUCCESS_MEMBER_CREATED(201, "정상적으로 가입되었습니다"),
     SUCCESS_CREATING(201, "생성에 성공하였습니다."),
     /**
      * 401 JWT 관련 에러

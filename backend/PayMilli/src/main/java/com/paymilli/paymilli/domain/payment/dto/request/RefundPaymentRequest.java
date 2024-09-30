@@ -5,5 +5,5 @@ import lombok.Getter;
 @Getter
 public class RefundPaymentRequest {
 
-    private String refundKey;
+    private String refundToken;
 }

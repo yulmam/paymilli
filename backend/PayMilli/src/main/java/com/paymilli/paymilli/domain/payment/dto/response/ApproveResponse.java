@@ -7,5 +7,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ApproveResponse {
 
-    String refundKey;
+    String storeName;
+    int totalPrice;
+    String detail;
+    String refundToken;
 }
