@@ -3,6 +3,7 @@ package com.paymilli.paymilli.domain.payment.controller;
 import com.paymilli.paymilli.domain.payment.dto.request.ApprovePaymentRequest;
 import com.paymilli.paymilli.domain.payment.dto.request.DemandPaymentRequest;
 import com.paymilli.paymilli.domain.payment.dto.request.RefundPaymentRequest;
+import com.paymilli.paymilli.domain.payment.dto.response.ApproveResponse;
 import com.paymilli.paymilli.domain.payment.dto.response.DemandResponse;
 import com.paymilli.paymilli.domain.payment.service.PaymentService;
 import com.paymilli.paymilli.global.exception.BaseResponse;
@@ -42,14 +43,13 @@ public class PaymentController {
     }
 
     @PostMapping("/approve")
-    public ResponseEntity<BaseResponse<Void>> approvePayment(
+    public ResponseEntity<BaseResponse<ApproveResponse>> approvePayment(
         @RequestHeader("Authorization") String token,
         @RequestHeader("transactionId") String transactionId,
         @RequestBody ApprovePaymentRequest approvePaymentRequest) {
 
-        paymentService.approvePayment(token, transactionId, approvePaymentRequest);
-
-        return ResponseEntity.ok(new BaseResponse<>(BaseResponseStatus.SUCCESS_PAYMENT));
+        return ResponseEntity.ok(new BaseResponse<>(
+            paymentService.approvePayment(token, transactionId, approvePaymentRequest)));
     }
 
     @GetMapping
@@ -75,15 +75,13 @@ public class PaymentController {
     }
 
     @PostMapping("/refund")
-    public ResponseEntity<?> refundPayment(
+    public ResponseEntity<BaseResponse<?>> refundPayment(
         @RequestHeader("Authorization") String token,
         @RequestBody RefundPaymentRequest refundPaymentRequest) {
         if (paymentService.refundPayment(refundPaymentRequest)) {
-            return new ResponseEntity<>("환불 요청이 처리되었습니다.",
-                HttpStatus.OK);
+            return ResponseEntity.ok(new BaseResponse<>(BaseResponseStatus.SUCCESS_PAYMENT));
         }
 
-        return new ResponseEntity<>("환불 오류가 발생하였습니다.",
-            HttpStatus.NOT_FOUND);
+        return ResponseEntity.ok(new BaseResponse<>(BaseResponseStatus.REFUND_ERROR));
     }
 }
