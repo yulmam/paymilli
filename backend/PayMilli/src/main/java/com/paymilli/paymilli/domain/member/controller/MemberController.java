@@ -12,7 +12,6 @@ import com.paymilli.paymilli.domain.member.jwt.TokenProvider;
 import com.paymilli.paymilli.domain.member.service.MemberService;
 import com.paymilli.paymilli.global.exception.BaseResponse;
 import com.paymilli.paymilli.global.exception.BaseResponseStatus;
-
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import java.util.UUID;
@@ -42,7 +41,8 @@ public class MemberController {
 
 
     @PostMapping("/join")
-    public ResponseEntity<BaseResponse<Void>> addMember(@RequestBody AddMemberRequest addMemberRequest) {
+    public ResponseEntity<BaseResponse<Void>> addMember(
+        @RequestBody AddMemberRequest addMemberRequest) {
 
         memberService.addMember(addMemberRequest);
 
@@ -146,7 +146,7 @@ public class MemberController {
     private Cookie generateRefreshTokenCookie(String refreshToken) {
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
         refreshTokenCookie.setHttpOnly(true); // JavaScript에서 쿠키 접근을 막음
-        refreshTokenCookie.setSecure(true);   // HTTPS를 통해서만 전송되도록 설정
+        refreshTokenCookie.setSecure(false);   // HTTPS를 통해서만 전송되도록 설정
         refreshTokenCookie.setPath("/");      // 쿠키가 전체 도메인에서 사용될 수 있도록 설정
         refreshTokenCookie.setMaxAge(7 * 24 * 60 * 60); // 쿠키의 유효 기간을 7일로 설정 (필요에 따라 조정)
 
