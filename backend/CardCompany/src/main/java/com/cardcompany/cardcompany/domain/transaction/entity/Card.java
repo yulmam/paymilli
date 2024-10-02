@@ -73,6 +73,18 @@ public class Card {
     @Column(nullable = false)
     private String userKey;
 
+    @Column(nullable = false)
+    private Long dailyLimit;
+
+    @Column(nullable = false)
+    private Long monthLimit;
+
+    @Column(nullable = false)
+    private Long remainDailyLimit;
+
+    @Column(nullable = false)
+    private Long remainMonthLimit;
+
     @Column(nullable = true)
     private String account;
 
