@@ -38,7 +38,7 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
             .authorizeHttpRequests(request -> request
-                .requestMatchers("/member/test").permitAll()
+                .requestMatchers("/member/check").permitAll()
                 .requestMatchers("/member/join").permitAll()
                 .requestMatchers("/member/login").permitAll()
                 .requestMatchers("/member/refresh").permitAll()

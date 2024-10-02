@@ -26,7 +26,7 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/v1/paymilli/member/join",
             "/api/v1/paymilli/member/login",
             "/api/v1/paymilli/member/refresh",
-            "/api/v1/paymilli/member/test"
+            "/api/v1/paymilli/member/check"
 
         };
 
