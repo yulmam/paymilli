@@ -10,6 +10,8 @@ import com.paymilli.paymilli.domain.card.entity.Card;
 import com.paymilli.paymilli.domain.card.repository.CardRepository;
 import com.paymilli.paymilli.domain.member.entity.Member;
 import com.paymilli.paymilli.domain.member.repository.MemberRepository;
+import com.paymilli.paymilli.global.exception.BaseException;
+import com.paymilli.paymilli.global.exception.BaseResponseStatus;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -37,7 +39,7 @@ public class CardServiceImpl implements CardService {
 
     @Transactional
     public void registerCard(AddCardRequest addCardRequest, UUID memberId) {
-        Member member = memberRepository.findById(memberId).orElseThrow(IllegalArgumentException::new);
+        Member member = memberRepository.findById(memberId).orElseThrow(()-> new BaseException(BaseResponseStatus.MEMBER_NOT_FOUND));
 
         CardValidationResponse response = cardClient.validateAndGetCardInfo(
             CardValidationRequest.builder()
@@ -55,7 +57,7 @@ public class CardServiceImpl implements CardService {
         if (cardOpt.isPresent()) {
             Card card = cardOpt.get();
             if (!card.isDeleted()) {
-                throw new IllegalArgumentException();
+                throw new BaseException(BaseResponseStatus.CARD_ALREADY_DELETED);
             }
             card.create();
             return;
@@ -79,7 +81,7 @@ public class CardServiceImpl implements CardService {
         int mainCardIdx = cards.indexOf(mainCard);
 
         if(mainCardIdx == -1){
-            throw new IllegalArgumentException();
+            throw new BaseException(BaseResponseStatus.MAIN_CARD_NOT_EXIST);
         }
 
         List<CardResponse> cardResponses = cards.stream()
@@ -99,14 +101,14 @@ public class CardServiceImpl implements CardService {
         Member member =  memberRepository.findById(memberId).orElseThrow();
 
         if(member.getMainCard().getId()==cardId){
-            throw new IllegalArgumentException();
+            throw new BaseException(BaseResponseStatus.CANT_DELETE_MAIN_CARD);
         }
 
         Card card = cardRepository.findByIdAndMemberId(cardId, memberId)
-            .orElseThrow(IllegalArgumentException::new);
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.CARD_NOT_FOUND));
 
         if(card.isDeleted()) {
-            throw new IllegalArgumentException();
+            throw new BaseException(BaseResponseStatus.CARD_ALREADY_DELETED);
         }
 
         card.delete();

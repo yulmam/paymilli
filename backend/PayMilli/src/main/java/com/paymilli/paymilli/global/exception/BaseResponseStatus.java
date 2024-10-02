@@ -11,9 +11,26 @@ public enum BaseResponseStatus {
      * 200 : 요청 성공
      */
     SUCCESS(200, "요청에 성공하였습니다."),
-    SUCCESS_PAYMENT(200, "결제가 정상처리 되었습니다."),
-    SUCCESS_MEMBER_CREATED(201, "정상적으로 가입되었습니다"),
     SUCCESS_CREATING(201, "생성에 성공하였습니다."),
+
+    //member 도메인
+    SUCCESS_MEMBER_CREATED(201, "정상적으로 가입되었습니다"),
+
+    //card 도메인
+    SUCCESS_MAIN_CARD_CHANGED(200, "메인카드 변경에 성공했습니다."),
+    SUCCESS_CARD_REGISTERED(200, "카드 등록에 성공했습니다."),
+    SUCCESS_CARD_DELETED(200, "카드 삭제에 성공했습니다."),
+
+    //payment 도메인
+    SUCCESS_PAYMENT(200, "결제가 정상처리 되었습니다."),
+
+    /**
+     * 400 잘못된 요청이 왔을 때, Query Parameter나 Request Body가 잘못 왔을 때
+     */
+    CARD_ALREADY_DELETED(400, "이미 삭제된 카드입니다."),
+    CANT_DELETE_MAIN_CARD(400, "메인 카드는 삭제할 수 없습니다."),
+    ALREADY_MAIN_CARD(400, "이미 메인카드 입니다."),
+
     /**
      * 401 JWT 관련 에러
      */
@@ -23,6 +40,8 @@ public enum BaseResponseStatus {
      * 404 리소스 못 찾는 에러
      */
     MEMBER_NOT_FOUND(404, "멤버를 찾을 수 없습니다."),
+    CARD_NOT_FOUND(404, "카드를 찾을 수 없습니다."),
+    MAIN_CARD_NOT_EXIST(404, "메인 카드가 존재하지 않습니다."),
     RESOURCE_NOT_FOUND(404, "리소스를 찾을 수 없습니다."),
     PAYMENT_ERROR(404, "결제 오류가 발생하였습니다."),
     REFUND_ERROR(404, "환불 오류가 발생하였습니다."),

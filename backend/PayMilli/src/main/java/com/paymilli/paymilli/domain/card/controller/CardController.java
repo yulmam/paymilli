@@ -8,6 +8,8 @@ import com.paymilli.paymilli.domain.card.dto.response.CardListResponse;
 import com.paymilli.paymilli.domain.card.dto.response.CardResponse;
 import com.paymilli.paymilli.domain.card.service.CardService;
 import com.paymilli.paymilli.domain.member.jwt.TokenProvider;
+import com.paymilli.paymilli.global.exception.BaseResponse;
+import com.paymilli.paymilli.global.exception.BaseResponseStatus;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.http.HttpStatus;
@@ -42,7 +44,7 @@ public class CardController {
 
         cardService.registerCard(addCardRequest, memberId);
 
-        return new ResponseEntity<>("정상적으로 등록되었습니다.", HttpStatus.OK);
+        return ResponseEntity.ok(new BaseResponse<Void>(BaseResponseStatus.SUCCESS_CARD_REGISTERED));
     }
 
 
@@ -52,7 +54,7 @@ public class CardController {
         String accessToken = tokenProvider.extractAccessToken(token);
         UUID memberId = tokenProvider.getId(accessToken);
 
-        return new ResponseEntity<>(cardService.searchCards(memberId), HttpStatus.OK);
+        return ResponseEntity.ok(cardService.searchCards(memberId));
     }
 
 
@@ -63,18 +65,17 @@ public class CardController {
 
         cardService.changeMainCard(request.getCardId(), memberId);
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok(new BaseResponse<Void>(BaseResponseStatus.SUCCESS_MAIN_CARD_CHANGED));
     }
 
 
     @DeleteMapping
     public ResponseEntity<?> deleteCard(@RequestHeader("Authorization") String token,
         @RequestBody DeleteCardRequest deleteCardRequest) {
-        //userId 수정 필요
         String accessToken = tokenProvider.extractAccessToken(token);
         UUID memberId = tokenProvider.getId(accessToken);
 
         cardService.deleteCard(deleteCardRequest.getCardId(), memberId);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok(new BaseResponse<Void>(BaseResponseStatus.SUCCESS_CARD_DELETED));
     }
 }
