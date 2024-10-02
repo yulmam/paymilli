@@ -14,10 +14,9 @@ import com.paymilli.paymilli.domain.member.entity.Member;
 import com.paymilli.paymilli.domain.member.exception.MemberNotExistException;
 import com.paymilli.paymilli.domain.member.jwt.TokenProvider;
 import com.paymilli.paymilli.domain.member.repository.MemberRepository;
-import com.paymilli.paymilli.global.util.RedisUtil;
 import com.paymilli.paymilli.global.exception.BaseException;
 import com.paymilli.paymilli.global.exception.BaseResponseStatus;
-
+import com.paymilli.paymilli.global.util.RedisUtil;
 import jakarta.transaction.Transactional;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -100,8 +99,11 @@ public class MemberService {
 
     @Transactional
     public boolean isSameRefreshToken(String refreshToken) {
-        String savedRefreshToken = tokenProvider.getRefreshToken(refreshToken);
+        UUID memberId = tokenProvider.getId(refreshToken);
 
+        String savedRefreshToken = tokenProvider.getRefreshToken(memberId.toString());
+
+        System.out.println(savedRefreshToken);
         return savedRefreshToken != null;
     }
 
@@ -125,7 +127,7 @@ public class MemberService {
     @Transactional
     public String reissueAccessToken(String refreshToken) {
         Authentication authentication = tokenProvider.getAuthentication(refreshToken);
-        return tokenProvider.createAccessToken(authentication);
+        return tokenProvider.createAccessToken(authentication, refreshToken);
     }
 
     @Transactional

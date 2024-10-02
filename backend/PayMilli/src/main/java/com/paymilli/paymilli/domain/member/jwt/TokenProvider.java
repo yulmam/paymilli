@@ -82,7 +82,7 @@ public class TokenProvider implements InitializingBean {
             .setExpiration(validity)
             .compact();
 
-        redisUtil.saveDataToRedis(authentication.getName(), refreshToken,
+        redisUtil.saveDataToRedis(id.toString(), refreshToken,
             refreshTokenValidityInMilliseconds);
 
         return refreshToken;
@@ -108,8 +108,28 @@ public class TokenProvider implements InitializingBean {
             .compact();
     }
 
+    public String createAccessToken(Authentication authentication, String refreshToken) {
+        String authorities = authentication.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.joining(","));
+
+        long now = (new Date()).getTime();
+        Date validity = new Date(now + this.accessTokenValidityInMilliseconds);
+
+        UUID id = getId(refreshToken);
+
+        return Jwts.builder()
+            .setSubject(id.toString())
+            .claim(AUTHORITIES_KEY, authorities)
+            .signWith(key, SignatureAlgorithm.HS512)
+            .setExpiration(validity)
+            .compact();
+    }
+
     private UUID getUUID(Authentication authentication) {
         String memberID = authentication.getName();
+
+        System.out.println(memberID);
 
         Member member = memberRepository.findByMemberId(memberID).orElseThrow();
         return member.getId();
@@ -132,6 +152,12 @@ public class TokenProvider implements InitializingBean {
                 .collect(Collectors.toList());
 
         log.info("authorities: {}", authorities);
+
+        System.out.println("subject: " + claims.getSubject());
+        System.out.println("issuer: " + claims.getIssuer());
+        System.out.println("audience: " + claims.getAudience());
+        System.out.println("expiration: " + claims.getExpiration());
+        System.out.println("id: " + claims.getId());
 
         // 권한 정보를 이용해서 User 객체를 만듬
         User principal = new User(claims.getSubject(), "", authorities);
