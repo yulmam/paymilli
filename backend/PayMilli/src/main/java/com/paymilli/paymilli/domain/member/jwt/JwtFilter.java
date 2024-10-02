@@ -25,7 +25,10 @@ public class JwtFilter extends OncePerRequestFilter {
         String[] excludePath = {
             "/api/v1/paymilli/member/join",
             "/api/v1/paymilli/member/login",
-            "/api/v1/paymilli/member/refresh"};
+            "/api/v1/paymilli/member/refresh",
+            "/api/v1/paymilli/member/test"
+
+        };
 
         String path = request.getRequestURI();
 

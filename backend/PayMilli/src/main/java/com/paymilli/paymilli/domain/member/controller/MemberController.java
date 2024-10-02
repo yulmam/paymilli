@@ -142,6 +142,11 @@ public class MemberController {
             HttpStatus.OK);
     }
 
+    @GetMapping("/test")
+    public ResponseEntity<?> connectedTest() {
+        return new ResponseEntity<>("이 문구가 나온다면 제대로 연결된거래요", HttpStatus.OK);
+    }
+
 
     private Cookie generateRefreshTokenCookie(String refreshToken) {
         Cookie refreshTokenCookie = new Cookie("refreshToken", refreshToken);
