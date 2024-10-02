@@ -60,16 +60,18 @@ public class TransactionServiceImpl implements TransactionService {
 
     @Override
     public CardInfoResponse getCardInfo(CardValidationRequest request) {
-        return cardRepository
-            .findByCardNumberAndCvcAndExpirationDateAndCardPasswordAndUserKey(
+        Card card = cardRepository
+            .findByCardNumberAndCvcAndExpirationDateAndUserKey(
                 request.getCardNumber(),
                 request.getCvc(),
                 request.getExpirationDate(),
-                request.getCardPassword(),
                 request.getUserKey()
             )
-            .orElseThrow(InvalidCardException::new)
-            .makeCardInfoResponse();
+            .orElseThrow(InvalidCardException::new);
+
+        checkPassword(request.getCardPassword(), card.getCardPassword());
+
+        return card.makeCardInfoResponse();
     }
 
     @Override
@@ -102,7 +104,6 @@ public class TransactionServiceImpl implements TransactionService {
         }
         if (userCard.getCardType() == CardType.CREDIT) {
             creditRefund(payment);
-
         }
     }
 
@@ -137,7 +138,7 @@ public class TransactionServiceImpl implements TransactionService {
         );
 
         //payment가 된다면
-        UpdateDemandDepositAccountWithdrawalResponse response = transactionClient.payCheck(
+        transactionClient.payCheck(
             card.makeUpdateDemandDepositAccountWithdrawalResponse(
                 String.valueOf(request.getPrice()),
                 keyProperties.getApikey()
@@ -171,5 +172,12 @@ public class TransactionServiceImpl implements TransactionService {
 
         installmentRepository.saveAll(payment.getInstallments());
         return approveNumber;
+    }
+
+    //카드 패스워드 앞 두자리만 체크
+    private void checkPassword(String requestPassword, String userPassword) {
+        String twoDigitsPassword = userPassword.substring(0, 2);
+        if(!twoDigitsPassword.equals(requestPassword))
+            throw new InvalidCardException();
     }
 }
