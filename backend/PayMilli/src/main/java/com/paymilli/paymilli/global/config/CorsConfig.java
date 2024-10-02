@@ -17,7 +17,7 @@ public class CorsConfig {
         //프론트 로컬 다 뚫기
         config.setAllowCredentials(true);
         config.setAllowedOrigins(
-            List.of("http://localhost:3000", "https://j11a702.p.ssafy.io"));
+            List.of("http://localhost:3000", "https://j11a702.p.ssafy.io", "http://j11a702.p.ssafy.io"));
         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         config.setAllowedHeaders(List.of("*"));
         config.setExposedHeaders(List.of("*"));
