@@ -100,7 +100,7 @@ public class CardServiceImpl implements CardService {
     public void deleteCard(UUID cardId, UUID memberId) {
         Member member =  memberRepository.findById(memberId).orElseThrow();
 
-        if(member.getMainCard().getId()==cardId){
+        if(member.getMainCard().getId().equals(cardId)){
             throw new BaseException(BaseResponseStatus.CANT_DELETE_MAIN_CARD);
         }
 
@@ -120,7 +120,7 @@ public class CardServiceImpl implements CardService {
 
         Card card = cardRepository.findByIdAndMemberId(cardId, memberId).orElseThrow(IllegalArgumentException::new);
 
-        if(member.getMainCard().getId()==card.getId()){
+        if(member.getMainCard().getId().equals(card.getId())){
             throw new IllegalArgumentException();
         }
 
