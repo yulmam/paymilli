@@ -5,7 +5,7 @@ import lombok.Getter;
 @Getter
 public class RefundPaymentRequest {
 
-    private String refundToken;
+    private final String refundToken;
 
     public RefundPaymentRequest(String refundToken) {
         this.refundToken = refundToken;
