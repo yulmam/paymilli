@@ -16,8 +16,6 @@ public class TransactionExceptionHandler {
             .code(e.getCode())
             .message(e.getMessage())
             .build();
-        System.out.println(e.getCode());
-        System.out.println(e.getMessage());
         return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 }

@@ -9,9 +9,9 @@ spring:
     name: PayMilli
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://localhost:3306/cardcompanydb?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://localhost:3306/cardserver?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
     username: root
-    password: 1234
+    password: root
   jpa:
     properties:
       hibernate:
@@ -21,5 +21,7 @@ spring:
         format_sql: true
         show_sql: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     open-in-view: true
+ssafy:
+  apikey: 8cdca4197e95472e9e2947dedeaf6f72
