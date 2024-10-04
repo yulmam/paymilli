@@ -135,10 +135,6 @@ public class Card {
 
     public UpdateDemandDepositAccountWithdrawalRequest makeUpdateDemandDepositAccountWithdrawalResponse(
         String paymentBalance, String apikey) {
-        log.info(apikey);
-        log.info(paymentBalance);
-        log.info(account);
-        log.info(userKey);
         return UpdateDemandDepositAccountWithdrawalRequest.builder()
             .globalHeader(
                 new GlobalHeaderRequest(

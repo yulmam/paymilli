@@ -1,5 +1,6 @@
 package com.cardcompany.cardcompany.global.config;
 
+import com.cardcompany.cardcompany.global.handler.ClientErrorHandler;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,8 +13,9 @@ public class WebClientConfig {
 
     @Bean
     public WebClient.Builder webClientBuilder() {
-        return WebClient.builder().
-            baseUrl(BASE_URL);
+        return WebClient.builder()
+                .baseUrl(BASE_URL)
+                .filter(new ClientErrorHandler());
     }
 
 }
