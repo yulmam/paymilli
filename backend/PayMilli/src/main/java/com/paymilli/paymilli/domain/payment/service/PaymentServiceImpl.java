@@ -95,11 +95,13 @@ public class PaymentServiceImpl implements PaymentService {
         ApprovePaymentRequest approvePaymentRequest) {
 
         String accessToken = tokenProvider.extractAccessToken(token);
-        Member member = memberRepository.findById(tokenProvider.getId(accessToken))
+        UUID id = tokenProvider.getId(accessToken);
+        log.info(id.toString());
+        Member member = memberRepository.findById(id)
             .orElseThrow();
 
         if (isNotSamePaymentPassword(member, approvePaymentRequest.getPassword())) {
-            throw new BaseException(BaseResponseStatus.PAYMENT_ERROR);
+            throw new BaseException(BaseResponseStatus.PAYMENT_PASSWORD_ERROR);
         }
 
         //redis로 데이터 가져옴

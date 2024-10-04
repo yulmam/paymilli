@@ -43,7 +43,8 @@ public enum BaseResponseStatus {
     CARD_NOT_FOUND(404, "카드를 찾을 수 없습니다."),
     MAIN_CARD_NOT_EXIST(404, "메인 카드가 존재하지 않습니다."),
     RESOURCE_NOT_FOUND(404, "리소스를 찾을 수 없습니다."),
-    PAYMENT_ERROR(404, "결제 오류가 발생하였습니다."),
+    PAYMENT_PASSWORD_ERROR(404, "결제 비밀번호가 일치하지 않습니다. 다시 입력해주세요."),
+    PAYMENT_ERROR(404, "결제 오류가 발생하였습니다. 관리자에게 문의해주세요."),
     REFUND_ERROR(404, "환불 오류가 발생하였습니다."),
 
     /**
