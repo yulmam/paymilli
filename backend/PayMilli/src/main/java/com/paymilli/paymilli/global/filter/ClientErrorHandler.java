@@ -20,8 +20,8 @@ public class ClientErrorHandler implements ExchangeFilterFunction {
             return response.bodyToMono(ClientExceptionResponse.class)
                 .flatMap(errorResponse ->
                     Mono.error(
-                        new ClientException(errorResponse.getResponseCode(),
-                            errorResponse.getResponseMessage())
+                        new ClientException(errorResponse.getCode(),
+                            errorResponse.getMessage())
                     ));
         } else {
             return Mono.just(response);

@@ -4,6 +4,7 @@ import com.paymilli.paymilli.global.exception.BaseException;
 import com.paymilli.paymilli.global.exception.BaseResponse;
 import com.paymilli.paymilli.global.exception.BaseResponseStatus;
 import com.paymilli.paymilli.global.exception.ClientException;
+import com.paymilli.paymilli.global.exception.ErrorResponse;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -28,13 +29,16 @@ public class GlobalExceptionHandler {
 
     //webclient발생시 에러 핸들링
     @ExceptionHandler(ClientException.class)
-    public ResponseEntity<ClientException> handleException(ClientException e) {
+    public ResponseEntity<ErrorResponse> handleException(ClientException e) {
         char code = e.getCode().charAt(0);//에러 내용을 분류하는 메인 character
-
+        ErrorResponse errorResponse = ErrorResponse.builder()
+            .errorCode(e.getCode())
+            .errorMessage(e.getMessage())
+            .build();
         if(code == 'A' || code == 'E')
-            return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
 
-        return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 	// BaseException으로 정의하지 않은 runtime exception
