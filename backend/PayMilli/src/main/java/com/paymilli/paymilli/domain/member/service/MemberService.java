@@ -1,5 +1,6 @@
 package com.paymilli.paymilli.domain.member.service;
 
+import com.paymilli.paymilli.domain.card.entity.Card;
 import com.paymilli.paymilli.domain.member.client.MemberClient;
 import com.paymilli.paymilli.domain.member.dto.client.CardCompLoginRequest;
 import com.paymilli.paymilli.domain.member.dto.client.CardCompLoginResponse;
@@ -150,6 +151,9 @@ public class MemberService {
     public void deleteMember(UUID memberId) {
         Member member = getMemberById(memberId);
         member.delete();
+
+        member.getCards()
+            .forEach(Card::delete);
 
         tokenProvider.removeRefreshToken(memberId);
     }
