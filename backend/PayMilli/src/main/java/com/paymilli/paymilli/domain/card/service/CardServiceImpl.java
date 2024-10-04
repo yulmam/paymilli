@@ -77,7 +77,7 @@ public class CardServiceImpl implements CardService {
         List<Card> cards = cardRepository.findByMemberId(memberId);
         if(cards.isEmpty())
             return new CardListResponse();
-        
+
         Card mainCard = memberRepository.findById(memberId).orElseThrow().getMainCard();
 
         //mainCard를 list에서 찾기
