@@ -11,6 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ClientExceptionResponse {
-    private String responseCode;
-    private String responseMessage;
+    private String code;
+    private String message;
 }
