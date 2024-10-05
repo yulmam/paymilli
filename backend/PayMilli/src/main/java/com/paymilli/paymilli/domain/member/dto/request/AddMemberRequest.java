@@ -8,13 +8,12 @@ public class AddMemberRequest {
 
     private String memberId;
     private String name;
-    private String email;
     private String password;
     private String birthday;
     private Gender gender;
     private String phone;
     private String paymentPassword;
-    
+
     public void setPassword(String password) {
         this.password = password;
     }

@@ -1,5 +1,7 @@
 package com.paymilli.paymilli.domain.member.jwt;
 
+import com.paymilli.paymilli.global.exception.BaseException;
+import com.paymilli.paymilli.global.exception.BaseResponseStatus;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,7 +29,6 @@ public class JwtFilter extends OncePerRequestFilter {
             "/api/v1/paymilli/member/login",
             "/api/v1/paymilli/member/refresh",
             "/api/v1/paymilli/member/check"
-
         };
 
         String path = request.getRequestURI();
@@ -49,6 +50,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 requestURI);
         } else {
             log.info("유효한 JWT 토큰이 없습니다, uri: {}", requestURI);
+            throw new BaseException(BaseResponseStatus.UNAUTHORIZED);
         }
 
         filterChain.doFilter(request, response);
