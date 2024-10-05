@@ -1,5 +1,8 @@
 package com.paymilli.paymilli.global.handler;
 
+import com.paymilli.paymilli.domain.payment.dto.response.ErrorCardResponse;
+import com.paymilli.paymilli.domain.payment.exception.CardException;
+import com.paymilli.paymilli.domain.payment.exception.PayErrorType;
 import com.paymilli.paymilli.global.exception.BaseException;
 import com.paymilli.paymilli.global.exception.BaseResponse;
 import com.paymilli.paymilli.global.exception.BaseResponseStatus;
@@ -25,6 +28,21 @@ public class GlobalExceptionHandler {
 		return ResponseEntity
 			.status(HttpStatusCode.valueOf(e.getStatus().getCode()))
 			.body(new BaseResponse<>(e.getStatus()));
+	}
+
+	// 결제 오류시 발생
+	@ExceptionHandler(CardException.class)
+	public ResponseEntity<BaseResponse<ErrorCardResponse>> handleCardException(CardException e) {
+
+		String clientMsg = String.valueOf(PayErrorType.of(e.getExcep().getCode()));
+
+		ErrorCardResponse response = ErrorCardResponse.builder()
+			.cardName(e.getCardName())
+			.cardNumber(e.getCardLastNumber())
+			.cause(clientMsg)
+			.build();
+
+		return new ResponseEntity<>(new BaseResponse<>(BaseResponseStatus.PAYMENT_ERROR, response), HttpStatus.BAD_REQUEST);
 	}
 
     //webclient발생시 에러 핸들링
