@@ -1,6 +1,8 @@
 package com.cardcompany.cardcompany.domain.transaction.advice;
 
+import com.cardcompany.cardcompany.domain.transaction.exception.IncorrectPasswordException;
 import com.cardcompany.cardcompany.domain.transaction.exception.InvalidCardException;
+import com.cardcompany.cardcompany.domain.transaction.exception.InvalidRefundException;
 import com.cardcompany.cardcompany.global.dto.response.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -12,6 +14,24 @@ public class TransactionExceptionHandler {
 
     @ExceptionHandler(InvalidCardException.class)
     public ResponseEntity<ErrorResponse> InvalidCardExceptionHandler(InvalidCardException e) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+            .code(e.getCode())
+            .message(e.getMessage())
+            .build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(InvalidRefundException.class)
+    public ResponseEntity<ErrorResponse> InvalidCardExceptionHandler(InvalidRefundException e) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+            .code(e.getCode())
+            .message(e.getMessage())
+            .build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IncorrectPasswordException.class)
+    public ResponseEntity<ErrorResponse> IncorrectPasswordExceptionHandler(IncorrectPasswordException e) {
         ErrorResponse errorResponse = ErrorResponse.builder()
             .code(e.getCode())
             .message(e.getMessage())

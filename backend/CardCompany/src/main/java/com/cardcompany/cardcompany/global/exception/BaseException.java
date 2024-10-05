@@ -6,9 +6,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 public class BaseException extends RuntimeException {
-
     String code;
-
     public BaseException(String code, String message) {
         super(message);
         this.code = code;

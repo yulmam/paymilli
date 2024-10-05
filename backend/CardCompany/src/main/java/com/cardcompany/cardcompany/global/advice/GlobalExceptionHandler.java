@@ -2,6 +2,7 @@ package com.cardcompany.cardcompany.global.advice;
 
 import com.cardcompany.cardcompany.global.dto.response.ErrorResponse;
 import com.cardcompany.cardcompany.global.exception.BaseException;
+import com.cardcompany.cardcompany.global.exception.ClientException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,13 +11,22 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+
     @ExceptionHandler(BaseException.class)
     public ResponseEntity<?> handleBaseException(BaseException e) {
         ErrorResponse errorResponse = ErrorResponse.builder()
             .code(e.getCode())
             .message(e.getMessage())
             .build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
 
+    @ExceptionHandler(ClientException.class)
+    public ResponseEntity<?> handleClientException(ClientException e) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+            .code(e.getCode())
+            .message(e.getMessage())
+            .build();
         char code = e.getCode().charAt(0);
 
         //A는 사용자가 잘못된 요청을 했을 떄

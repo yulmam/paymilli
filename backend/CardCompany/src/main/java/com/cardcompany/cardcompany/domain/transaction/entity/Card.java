@@ -1,6 +1,7 @@
 package com.cardcompany.cardcompany.domain.transaction.entity;
 
 import com.cardcompany.cardcompany.domain.transaction.dto.client.CreateCreditCardTransactionRequest;
+import com.cardcompany.cardcompany.domain.transaction.dto.client.UpdateDemandDepositAccountTransferRequest;
 import com.cardcompany.cardcompany.domain.transaction.dto.client.UpdateDemandDepositAccountWithdrawalRequest;
 import com.cardcompany.cardcompany.domain.transaction.dto.client.UpdateDemandDepositAccountWithdrawalResponse;
 import com.cardcompany.cardcompany.domain.transaction.dto.response.CardInfoResponse;
@@ -11,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import java.util.Locale;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -134,6 +136,25 @@ public class Card {
             .accountNo(account)
             .transactionBalance(paymentBalance)
             .transactionSummary("체크 카드 결제")
+            .build();
+    }
+
+    public UpdateDemandDepositAccountTransferRequest makeUpdateDemandDepositAccountTransferRequest(
+        String paymentBalance, String apikey
+    ){
+        return UpdateDemandDepositAccountTransferRequest.builder()
+            .globalHeader(
+                new GlobalHeaderRequest(
+                    "updateDemandDepositAccountTransfer",
+                    apikey,
+                    userKey
+                )
+            )
+            .withdrawalAccountNo(account)
+            .transactionBalance(paymentBalance)
+            .withdrawalTransactionSummary("체크 카드 결제")
+            .depositAccountNo("0019465466558287")
+            .depositTransactionSummary("페이밀리 결제")
             .build();
     }
 
