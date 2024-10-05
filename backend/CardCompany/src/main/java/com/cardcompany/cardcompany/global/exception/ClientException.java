@@ -7,9 +7,12 @@ import lombok.Setter;
 
 @Getter
 @Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class ClientException {
-    private String responseCode;
-    private String responseMessage;
+public class ClientException extends RuntimeException{
+
+    String code;
+
+    public ClientException(String code, String message) {
+        super(message);
+        this.code = code;
+    }
 }

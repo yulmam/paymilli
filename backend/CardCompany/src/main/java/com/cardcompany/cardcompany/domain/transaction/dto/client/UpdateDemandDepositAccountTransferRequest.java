@@ -11,10 +11,12 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UpdateDemandDepositAccountDepositRequest {
+public class UpdateDemandDepositAccountTransferRequest {
     @JsonProperty("Header")
     private GlobalHeaderRequest globalHeader;
-    private String accountNo;
+    private String depositAccountNo;
+    private String depositTransactionSummary;
     private String transactionBalance;
-    private String transactionSummary;
+    private String withdrawalAccountNo;
+    private String withdrawalTransactionSummary;
 }

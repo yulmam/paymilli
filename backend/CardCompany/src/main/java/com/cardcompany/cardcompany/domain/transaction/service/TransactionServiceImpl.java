@@ -86,7 +86,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         CardType cardType = card.getCardType();
         if (cardType == CardType.CHECK) {
-            return new PayResponse(checkPayment(card, request));
+            return new PayResponse(checkPaymentImpl(card, request));
         }
         //체크카드가 아니면 바로 신용카드
         return new PayResponse(creditPayment(card, request));
@@ -127,6 +127,14 @@ public class TransactionServiceImpl implements TransactionService {
 
     public String checkPayment(Card card, PayRequest request) {
         String approveNumber = approveNumberUtils.makeApproveNumber(card.getCardType());
+
+        transactionClient.payCheck(
+            card.makeUpdateDemandDepositAccountWithdrawalResponse(
+                String.valueOf(request.getPrice()),
+                keyProperties.getApikey()
+            )
+        );
+
         paymentRepository.save(
             Payment.builder()
                 .price(request.getPrice())
@@ -136,13 +144,28 @@ public class TransactionServiceImpl implements TransactionService {
                 .card(card)
                 .build()
         );
+        return approveNumber;
+    }
+
+    public String checkPaymentImpl(Card card, PayRequest request) {
+        String approveNumber = approveNumberUtils.makeApproveNumber(card.getCardType());
 
         //payment가 된다면
-        transactionClient.payCheck(
-            card.makeUpdateDemandDepositAccountWithdrawalResponse(
+        transactionClient.payTransfer(
+            card.makeUpdateDemandDepositAccountTransferRequest(
                 String.valueOf(request.getPrice()),
                 keyProperties.getApikey()
             )
+        );
+
+        paymentRepository.save(
+            Payment.builder()
+                .price(request.getPrice())
+                .storeName(request.getStoreName())
+                .paymentStatus(PaymentStatus.PAID)
+                .approveNumber(approveNumber)
+                .card(card)
+                .build()
         );
 
         return approveNumber;

@@ -1,7 +1,7 @@
 package com.cardcompany.cardcompany.global.handler;
 
-import com.cardcompany.cardcompany.global.exception.BaseException;
 import com.cardcompany.cardcompany.global.exception.ClientException;
+import com.cardcompany.cardcompany.global.handler.dto.ClientErrorResponse;
 import org.springframework.web.reactive.function.client.ClientRequest;
 import org.springframework.web.reactive.function.client.ClientResponse;
 import org.springframework.web.reactive.function.client.ExchangeFilterFunction;
@@ -17,12 +17,16 @@ public class ClientErrorHandler implements ExchangeFilterFunction {
 
     private Mono<ClientResponse> handleStatus(ClientResponse response) {
         if (response.statusCode().is4xxClientError() || response.statusCode().is5xxServerError()) {
-            return response.bodyToMono(ClientException.class)
-                .flatMap(errorResponse ->
-                    Mono.error(
-                            new BaseException(errorResponse.getResponseCode(),
+            return response.bodyToMono(ClientErrorResponse.class)
+                .flatMap(errorResponse ->{
+                        System.out.println(errorResponse.getResponseCode());
+                        System.out.println(errorResponse.getResponseMessage());
+                        return Mono.error(
+                            new ClientException(errorResponse.getResponseCode(),
                                 errorResponse.getResponseMessage())
-                    ));
+                        );
+                    }
+                    );
         } else {
             return Mono.just(response);
         }
