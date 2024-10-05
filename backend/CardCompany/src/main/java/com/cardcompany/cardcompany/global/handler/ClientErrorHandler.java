@@ -19,8 +19,6 @@ public class ClientErrorHandler implements ExchangeFilterFunction {
         if (response.statusCode().is4xxClientError() || response.statusCode().is5xxServerError()) {
             return response.bodyToMono(ClientErrorResponse.class)
                 .flatMap(errorResponse ->{
-                        System.out.println(errorResponse.getResponseCode());
-                        System.out.println(errorResponse.getResponseMessage());
                         return Mono.error(
                             new ClientException(errorResponse.getResponseCode(),
                                 errorResponse.getResponseMessage())

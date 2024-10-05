@@ -32,7 +32,7 @@ public class TransactionClient {
     public UpdateDemandDepositAccountWithdrawalResponse payCheck(
         UpdateDemandDepositAccountWithdrawalRequest request) {
         return webClient.post()
-            .uri("/edu/demandDeposit/updateDemandDepositAccountTransfer")
+            .uri("/edu/demandDeposit/updateDemandDepositWithdrawalResponse")
             .accept(MediaType.APPLICATION_JSON)
             .acceptCharset(StandardCharsets.UTF_8)
             .bodyValue(request)
@@ -58,10 +58,6 @@ public class TransactionClient {
     public UpdateDemandDepositAccountTransferResponse payTransfer(
         UpdateDemandDepositAccountTransferRequest request
     ){
-
-        System.out.println(request.getDepositAccountNo());
-        System.out.println(request.getWithdrawalAccountNo());
-        System.out.println("check");
         return webClient.post()
             .uri("/edu/demandDeposit/updateDemandDepositAccountTransfer")
             .accept(MediaType.APPLICATION_JSON)
