@@ -83,7 +83,7 @@ public class TokenProvider implements InitializingBean {
             .compact();
 
         redisUtil.saveDataToRedis(id.toString(), refreshToken,
-            60 * 1000);
+            refreshTokenValidityInMilliseconds);
 
         return refreshToken;
     }
