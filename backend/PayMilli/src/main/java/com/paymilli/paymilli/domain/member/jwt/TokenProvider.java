@@ -2,8 +2,8 @@ package com.paymilli.paymilli.domain.member.jwt;
 
 import com.paymilli.paymilli.domain.member.entity.Member;
 import com.paymilli.paymilli.domain.member.repository.MemberRepository;
-import com.paymilli.paymilli.global.exception.TokenExpiredException;
-import com.paymilli.paymilli.global.exception.TokenInvalidException;
+import com.paymilli.paymilli.global.exception.BaseException;
+import com.paymilli.paymilli.global.exception.BaseResponseStatus;
 import com.paymilli.paymilli.global.util.RedisUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -171,16 +171,16 @@ public class TokenProvider implements InitializingBean {
             return true;
         } catch (ExpiredJwtException e) {
             log.info("만료된 JWT 토큰입니다.");
-            throw new TokenExpiredException("JWT 토큰이 만료되었습니다.");
+            throw new BaseException(BaseResponseStatus.UNAUTHORIZED);
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("잘못된 JWT 서명입니다.");
-            throw new TokenInvalidException("잘못된 JWT 서명입니다.");
+            throw new BaseException(BaseResponseStatus.UNAUTHORIZED);
         } catch (UnsupportedJwtException e) {
             log.info("지원되지 않는 JWT 토큰입니다.");
-            throw new TokenInvalidException("지원되지 않는 JWT 토큰입니다.");
+            throw new BaseException(BaseResponseStatus.UNAUTHORIZED);
         } catch (IllegalArgumentException e) {
             log.info("JWT 토큰이 잘못되었습니다.");
-            throw new TokenInvalidException("JWT 토큰이 잘못되었습니다.");
+            throw new BaseException(BaseResponseStatus.UNAUTHORIZED);
         }
     }
 

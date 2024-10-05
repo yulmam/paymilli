@@ -97,7 +97,7 @@ public class Member {
     private boolean deleted;
 
     public static Member toEntity(AddMemberRequest addMemberRequest, String userKey,
-        LocalDate birthday, String encodePassword, String encodePaymentPassword) {
+        LocalDate birthday, String encodePassword, String encodePaymentPassword, String email) {
         return Member.builder()
             .memberId(addMemberRequest.getMemberId())
             .password(encodePassword)
@@ -107,7 +107,7 @@ public class Member {
             .role(Role.USER)
             .paymentPassword(encodePaymentPassword)
             .userKey(userKey)
-            .email(addMemberRequest.getEmail())
+            .email(email)
             .phone(addMemberRequest.getPhone())
             .build();
     }
@@ -128,7 +128,7 @@ public class Member {
         this.paymentPassword = paymentPassword;
     }
 
-    public void setMainCard(Card mainCard){
+    public void setMainCard(Card mainCard) {
         this.mainCard = mainCard;
     }
 
@@ -153,9 +153,7 @@ public class Member {
 
     public void update(AddMemberRequest addMemberRequest, String encodePassword,
         String encodePaymentPassword, LocalDate birthday) {
-        memberId = addMemberRequest.getMemberId();
         name = addMemberRequest.getName();
-        email = addMemberRequest.getEmail();
         password = encodePassword;
         this.birthday = birthday;
         gender = addMemberRequest.getGender();

@@ -10,6 +10,7 @@ import com.paymilli.paymilli.domain.member.dto.response.TokenResponse;
 import com.paymilli.paymilli.domain.member.jwt.JwtFilter;
 import com.paymilli.paymilli.domain.member.jwt.TokenProvider;
 import com.paymilli.paymilli.domain.member.service.MemberService;
+import com.paymilli.paymilli.global.exception.BaseException;
 import com.paymilli.paymilli.global.exception.BaseResponse;
 import com.paymilli.paymilli.global.exception.BaseResponseStatus;
 import jakarta.servlet.http.Cookie;
@@ -73,7 +74,7 @@ public class MemberController {
         String accessToken = tokenProvider.extractAccessToken(token);
         UUID memberId = tokenProvider.getId(accessToken);
 
-        return new ResponseEntity<>(memberService.getMemberInfo(memberId), HttpStatus.OK);
+        return new ResponseEntity(memberService.getMemberInfo(memberId), HttpStatus.OK);
     }
 
     @PostMapping("/logout")
@@ -91,19 +92,16 @@ public class MemberController {
         @CookieValue(value = "refreshToken", required = false) String refreshToken) {
 
         if (refreshToken == null) {
-            log.info("refreshToken not found");
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+            throw new BaseException(BaseResponseStatus.REFRESH_TOKEN_NOT_INPUT);
         }
 
-        if (tokenProvider.validateToken(refreshToken)) {
-            if (memberService.isSameRefreshToken(refreshToken)) {
-                String accessToken = memberService.reissueAccessToken(refreshToken);
-
-                return new ResponseEntity<>(new LoginResponse(accessToken), HttpStatus.OK);
-            }
+        if (!(tokenProvider.validateToken(refreshToken) && memberService.isSameRefreshToken(
+            refreshToken))) {
+            throw new BaseException(BaseResponseStatus.REFRESH_UNAUTHORIZED);
         }
 
-        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        String accessToken = memberService.reissueAccessToken(refreshToken);
+        return ResponseEntity.ok(new LoginResponse(accessToken));
     }
 
     @DeleteMapping
@@ -118,8 +116,13 @@ public class MemberController {
 
     @PutMapping("/payment/password")
     public ResponseEntity<?> updateMember(@RequestHeader("Authorization") String token,
-        @RequestHeader("paymentPasswordToken") String paymentPasswordToken,
+        @RequestHeader(value = "paymentPasswordToken", required = false) String paymentPasswordToken,
         @RequestBody UpdatePaymentPasswordRequest updatePaymentPasswordRequest) {
+
+        if (paymentPasswordToken == null) {
+            log.info("paymentPasswordToken 미입력");
+            throw new BaseException(BaseResponseStatus.PAYMENT_PASSWORD_TOKEN_NOT_FOUND);
+        }
 
         String accessToken = tokenProvider.extractAccessToken(token);
         UUID memberId = tokenProvider.getId(accessToken);

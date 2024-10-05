@@ -30,12 +30,15 @@ public enum BaseResponseStatus {
     CARD_ALREADY_DELETED(400, "이미 삭제된 카드입니다."),
     CANT_DELETE_MAIN_CARD(400, "메인 카드는 삭제할 수 없습니다."),
     ALREADY_MAIN_CARD(400, "이미 메인카드 입니다."),
+    INVALID_USER_JOIN(400, "동일 이메일 혹은 동일 아이디로 가입된 사용자가 있습니다."),
     PAYMENT_ERROR(400, "결제 오류가 발생하였습니다."),
 
     /**
      * 401 JWT 관련 에러
      */
+    REFRESH_TOKEN_NOT_INPUT(401, "refresh token이 입력되지 않았습니다. 다시 입력해주세요."),
     UNAUTHORIZED(401, "access token이 유효하지 않습니다."),
+    REFRESH_UNAUTHORIZED(401, "refresh token이 만료되었습니다. 다시 로그인 해주세요."),
 
     /**
      * 404 리소스 못 찾는 에러
@@ -46,6 +49,8 @@ public enum BaseResponseStatus {
     RESOURCE_NOT_FOUND(404, "리소스를 찾을 수 없습니다."),
     PAYMENT_PASSWORD_ERROR(404, "결제 비밀번호가 일치하지 않습니다. 다시 입력해주세요."),
     REFUND_ERROR(404, "환불 오류가 발생하였습니다."),
+    PAYMENT_PASSWORD_TOKEN_NOT_FOUND(404,
+        "PaymentPasswordToken이 유효하지 않습니다. 결제 비밀번호 인증과정을 다시 수행해주세요."),
 
     /**
      * 이미 존재하는 데이터
@@ -56,6 +61,7 @@ public enum BaseResponseStatus {
      * 인프라 에러
      */
     SERVER_ERROR(500, "서버 에러");
+
 
     private final int code;
     private final String message;
