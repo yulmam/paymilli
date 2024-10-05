@@ -8,12 +8,12 @@ import com.paymilli.paymilli.domain.payment.dto.response.cardcompany.PaymentInfo
 import com.paymilli.paymilli.domain.payment.entity.Payment;
 import com.paymilli.paymilli.domain.payment.entity.PaymentGroup;
 import com.paymilli.paymilli.domain.payment.entity.PaymentStatus;
+import com.paymilli.paymilli.domain.payment.exception.CardException;
 import com.paymilli.paymilli.domain.payment.exception.PaymentCardException;
-import com.paymilli.paymilli.domain.payment.exception.PaymentMilliException;
 import com.paymilli.paymilli.domain.payment.repository.PaymentGroupRepository;
 import com.paymilli.paymilli.domain.payment.repository.PaymentRepository;
-import com.paymilli.paymilli.global.exception.BaseException;
 import com.paymilli.paymilli.global.exception.BaseResponseStatus;
+import com.paymilli.paymilli.global.exception.ClientException;
 
 import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
@@ -58,20 +58,31 @@ public class PaymentDetailServiceImpl implements PaymentDetailService {
             // 성공시 결제 내역 DB 저장
             paymentGroup.setStatus(PaymentStatus.PAYMENT);
 
-        } catch (PaymentMilliException e) {
+        } catch (ClientException e) {
+
+            log.info("=== ClientException occur ===");
+            log.error(e.getMessage(), e);
 
             // 이전 내역 환불 처리
             for (int i = 0; i < paymentIdx; i++) {
                 requestSingleRefund(approveNumbers[i]);
             }
 
-            throw new BaseException(BaseResponseStatus.PAYMENT_ERROR);
+            // 에러 발생 카드
+            Payment payment = paymentGroup.getPayments().get(paymentIdx);
+            String cardNum = payment.getCard().getCardNumber();
+
+            log.info("=== throw PAYMENT_ERROR to client ===");
+            throw new CardException(BaseResponseStatus.PAYMENT_ERROR,
+                e,
+                payment.getCard().getCardName(),
+                cardNum.substring(cardNum.length() - 4),
+                e.getMessage());
+
         }
     }
 
-    private String requestSinglePayment(Payment payment, String storeName)
-        throws PaymentMilliException {
-        log.info("request init!@@@@@@@@@@@@@@@@@@@@@@@@@");
+    private String requestSinglePayment(Payment payment, String storeName) {
 
         Card card = payment.getCard();
 
@@ -106,7 +117,9 @@ public class PaymentDetailServiceImpl implements PaymentDetailService {
     }
 
     private boolean requestSingleRefund(String approveNumber) {
-        log.info(approveNumber);
+
+        log.info("requestSingleRefund : approveNumber : " + approveNumber);
+
         try {
             paymentClient.requestRefund(new PaymentRefundRequest(approveNumber));
         } catch (PaymentCardException e) {

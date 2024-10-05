@@ -21,6 +21,13 @@ public class BaseResponse<T> {
         this.result = result;
     }
 
+
+    public BaseResponse(BaseResponseStatus status, T result) {
+        this.message = status.getMessage();
+        this.code = status.getCode();
+        this.result = result;
+    }
+
     public BaseResponse(BaseResponseStatus status) {
         this.message = status.getMessage();
         this.code = status.getCode();
