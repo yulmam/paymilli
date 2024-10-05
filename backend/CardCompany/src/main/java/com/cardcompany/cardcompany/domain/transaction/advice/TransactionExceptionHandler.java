@@ -1,5 +1,6 @@
 package com.cardcompany.cardcompany.domain.transaction.advice;
 
+import com.cardcompany.cardcompany.domain.transaction.exception.IncorrectPasswordException;
 import com.cardcompany.cardcompany.domain.transaction.exception.InvalidCardException;
 import com.cardcompany.cardcompany.domain.transaction.exception.InvalidRefundException;
 import com.cardcompany.cardcompany.global.dto.response.ErrorResponse;
@@ -22,6 +23,15 @@ public class TransactionExceptionHandler {
 
     @ExceptionHandler(InvalidRefundException.class)
     public ResponseEntity<ErrorResponse> InvalidCardExceptionHandler(InvalidRefundException e) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+            .code(e.getCode())
+            .message(e.getMessage())
+            .build();
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IncorrectPasswordException.class)
+    public ResponseEntity<ErrorResponse> IncorrectPasswordExceptionHandler(IncorrectPasswordException e) {
         ErrorResponse errorResponse = ErrorResponse.builder()
             .code(e.getCode())
             .message(e.getMessage())

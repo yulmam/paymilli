@@ -17,6 +17,7 @@ import com.cardcompany.cardcompany.domain.transaction.entity.Installment;
 import com.cardcompany.cardcompany.domain.transaction.entity.InstallmentStatus;
 import com.cardcompany.cardcompany.domain.transaction.entity.Payment;
 import com.cardcompany.cardcompany.domain.transaction.entity.PaymentStatus;
+import com.cardcompany.cardcompany.domain.transaction.exception.IncorrectPasswordException;
 import com.cardcompany.cardcompany.domain.transaction.exception.InvalidCardException;
 import com.cardcompany.cardcompany.domain.transaction.exception.InvalidRefundException;
 import com.cardcompany.cardcompany.domain.transaction.repository.CardRepository;
@@ -108,7 +109,7 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     public void checkRefund(Payment payment) {
-        UpdateDemandDepositAccountDepositResponse response = transactionClient.refundCheck(
+        transactionClient.refundCheck(
             payment.makeUpdateDemandDepositAccountDepositRequest(keyProperties.getApikey())
         );
         paymentRepository.delete(payment);
@@ -201,6 +202,6 @@ public class TransactionServiceImpl implements TransactionService {
     private void checkPassword(String requestPassword, String userPassword) {
         String twoDigitsPassword = userPassword.substring(0, 2);
         if(!twoDigitsPassword.equals(requestPassword))
-            throw new InvalidCardException();
+            throw new IncorrectPasswordException();
     }
 }

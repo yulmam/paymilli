@@ -27,7 +27,6 @@ public class GlobalExceptionHandler {
             .code(e.getCode())
             .message(e.getMessage())
             .build();
-        System.out.println("test");
         char code = e.getCode().charAt(0);
 
         //A는 사용자가 잘못된 요청을 했을 떄
