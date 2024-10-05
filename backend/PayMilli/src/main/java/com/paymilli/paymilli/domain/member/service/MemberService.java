@@ -12,7 +12,6 @@ import com.paymilli.paymilli.domain.member.dto.response.MemberInfoResponse;
 import com.paymilli.paymilli.domain.member.dto.response.TokenResponse;
 import com.paymilli.paymilli.domain.member.dto.response.ValidatePaymentPasswordResponse;
 import com.paymilli.paymilli.domain.member.entity.Member;
-import com.paymilli.paymilli.domain.member.exception.MemberNotExistException;
 import com.paymilli.paymilli.domain.member.jwt.TokenProvider;
 import com.paymilli.paymilli.domain.member.repository.MemberRepository;
 import com.paymilli.paymilli.global.exception.BaseException;
@@ -78,12 +77,14 @@ public class MemberService {
             throw new BaseException(BaseResponseStatus.MEMBER_ALREADY_EXIST);
         }
 
+        String email = addMemberRequest.getMemberId() + "@ssafy.com";
+
         CardCompLoginResponse cardCompLoginResponse = memberClient.validateAndGetUserKey(
-            new CardCompLoginRequest(addMemberRequest.getEmail()));
+            new CardCompLoginRequest(email));
 
         Member member = Member.toEntity(addMemberRequest, cardCompLoginResponse.getUserKey(),
             birthday, passwordEncoder.encode(addMemberRequest.getPassword()),
-            passwordEncoder.encode(addMemberRequest.getPaymentPassword()));
+            passwordEncoder.encode(addMemberRequest.getPaymentPassword()), email);
 
         memberRepository.save(member);
     }
@@ -114,9 +115,14 @@ public class MemberService {
             new UsernamePasswordAuthenticationToken(tokenRequest.getMemberId(),
                 tokenRequest.getPassword());
 
-        Authentication authentication = authenticationManagerBuilder.getObject()
-            .authenticate(token);
+        Authentication authentication = null;
 
+        try {
+            authentication = authenticationManagerBuilder.getObject()
+                .authenticate(token);
+        } catch (Exception e) {
+            throw new BaseException(BaseResponseStatus.MEMBER_NOT_FOUND);
+        }
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
         String refreshToken = tokenProvider.createRefreshToken(authentication);
@@ -138,7 +144,7 @@ public class MemberService {
         Member member = getMemberById(memberId);
 
         if (!redisUtil.hasKey(paymentPasswordToken)) {
-            throw new IllegalArgumentException("적절하지 않는 수정 과정입니다. 결제 비밀번호 인증을 먼저 해주세요.");
+            throw new BaseException(BaseResponseStatus.PAYMENT_PASSWORD_ERROR);
         }
 
         member.setPaymentPassword(
@@ -161,10 +167,11 @@ public class MemberService {
     @Transactional
     public Member getMemberById(UUID memberId) {
         Member member = memberRepository.findByIdAndDeleted(memberId, false)
-            .orElseThrow(() -> new MemberNotExistException("Member Not found"));
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.MEMBER_NOT_FOUND));
 
         if (member.isDeleted()) {
-            throw new IllegalArgumentException();
+            log.info("삭제된 회원 조회");
+            throw new BaseException(BaseResponseStatus.MEMBER_NOT_FOUND);
         }
 
         return member;
@@ -174,12 +181,13 @@ public class MemberService {
     public ValidatePaymentPasswordResponse validatePaymentPassword(UUID memberId,
         ValidatePaymentPasswordRequest validatePaymentPasswordRequest) {
 
-        Optional<Member> memberOpt = memberRepository.findById(memberId);
+        Member member = memberRepository.findById(memberId)
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.MEMBER_NOT_FOUND));
 
         log.info(validatePaymentPasswordRequest.getPaymentPassword());
-        if (memberOpt.isEmpty() || !isEqualPassword(memberOpt.get().getPaymentPassword(),
+        if (!isEqualPassword(member.getPaymentPassword(),
             validatePaymentPasswordRequest.getPaymentPassword())) {
-            throw new IllegalArgumentException();
+            throw new BaseException(BaseResponseStatus.PAYMENT_PASSWORD_ERROR);
         }
 
         //redis 키 생성
