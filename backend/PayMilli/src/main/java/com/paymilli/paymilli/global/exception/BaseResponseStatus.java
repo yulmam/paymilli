@@ -32,6 +32,7 @@ public enum BaseResponseStatus {
     ALREADY_MAIN_CARD(400, "이미 메인카드 입니다."),
     INVALID_USER_JOIN(400, "동일 이메일 혹은 동일 아이디로 가입된 사용자가 있습니다."),
     PAYMENT_ERROR(400, "결제 오류가 발생하였습니다."),
+    LOGIN_ERROR(400, "아이디 또는 비밀번호가 일치하지 않습니다."),
 
     /**
      * 401 JWT 관련 에러
