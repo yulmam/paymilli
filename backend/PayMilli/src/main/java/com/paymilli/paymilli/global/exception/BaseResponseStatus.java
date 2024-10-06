@@ -22,7 +22,7 @@ public enum BaseResponseStatus {
     SUCCESS_CARD_DELETED(200, "카드 삭제에 성공했습니다."),
 
     //payment 도메인
-    SUCCESS_PAYMENT(200, "결제가 정상처리 되었습니다."),
+    SUCCESS_REFUND(200, "환불 처리가 완료되었습니다."),
 
     /**
      * 400 잘못된 요청이 왔을 때, Query Parameter나 Request Body가 잘못 왔을 때
