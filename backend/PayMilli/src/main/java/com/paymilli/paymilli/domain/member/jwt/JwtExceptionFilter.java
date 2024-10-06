@@ -44,6 +44,7 @@ public class JwtExceptionFilter extends OncePerRequestFilter {
         } catch (Exception e) {
             ObjectMapper objectMapper = new ObjectMapper();
             response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             response.setCharacterEncoding("UTF-8");
             response.getWriter().write(
                 objectMapper.writeValueAsString(new BaseResponse(BaseResponseStatus.UNAUTHORIZED)));

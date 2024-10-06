@@ -144,7 +144,7 @@ public class MemberService {
         Member member = getMemberById(memberId);
 
         if (!redisUtil.hasKey(paymentPasswordToken)) {
-            throw new BaseException(BaseResponseStatus.PAYMENT_PASSWORD_ERROR);
+            throw new BaseException(BaseResponseStatus.PAYMENT_PASSWORD_TOKEN_NOT_FOUND);
         }
 
         member.setPaymentPassword(
