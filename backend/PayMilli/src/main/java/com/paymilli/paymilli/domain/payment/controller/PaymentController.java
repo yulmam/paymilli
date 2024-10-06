@@ -79,7 +79,7 @@ public class PaymentController {
         @RequestHeader("Authorization") String token,
         @RequestBody RefundPaymentRequest refundPaymentRequest) {
         if (paymentService.refundPayment(refundPaymentRequest)) {
-            return ResponseEntity.ok(new BaseResponse<>(BaseResponseStatus.SUCCESS_PAYMENT));
+            return ResponseEntity.ok(new BaseResponse<>(BaseResponseStatus.SUCCESS_REFUND));
         }
 
         return ResponseEntity.ok(new BaseResponse<>(BaseResponseStatus.REFUND_ERROR));
