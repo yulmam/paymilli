@@ -75,7 +75,7 @@ public class PaymentServiceImpl implements PaymentService {
             .reduce(0, Integer::sum);
 
         if (totalPrice != demandPaymentRequest.getTotalPrice()) {
-            throw new IllegalArgumentException("입력 값이 부정확합니다. (결제 총액 != 각 결제액 합)");
+            throw new BaseException(BaseResponseStatus.PAYMENT_REQUEST_ERROR);
         }
 
         //redis key
@@ -98,7 +98,7 @@ public class PaymentServiceImpl implements PaymentService {
         UUID id = tokenProvider.getId(accessToken);
         log.info(id.toString());
         Member member = memberRepository.findById(id)
-            .orElseThrow();
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.MEMBER_NOT_FOUND));
 
         if (isNotSamePaymentPassword(member, approvePaymentRequest.getPassword())) {
             throw new BaseException(BaseResponseStatus.PAYMENT_PASSWORD_ERROR);
@@ -183,7 +183,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentGroupResponse getPaymentGroup(String paymentGroupId) {
         PaymentGroup paymentGroup = paymentGroupRepository.findById(UUID.fromString(paymentGroupId))
-            .orElseThrow();
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.PAYMENT_GROUP_NOT_FOUND));
 
         return paymentGroup.makeResponse();
     }

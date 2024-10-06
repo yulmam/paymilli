@@ -32,6 +32,7 @@ public enum BaseResponseStatus {
     ALREADY_MAIN_CARD(400, "이미 메인카드 입니다."),
     INVALID_USER_JOIN(400, "동일 이메일 혹은 동일 아이디로 가입된 사용자가 있습니다."),
     PAYMENT_ERROR(400, "결제 오류가 발생하였습니다."),
+    PAYMENT_REQUEST_ERROR(400, "요청된 결제 정보가 부정확합니다."),
     LOGIN_ERROR(400, "아이디 또는 비밀번호가 일치하지 않습니다."),
 
     /**
@@ -49,6 +50,7 @@ public enum BaseResponseStatus {
     MAIN_CARD_NOT_EXIST(404, "메인 카드가 존재하지 않습니다."),
     RESOURCE_NOT_FOUND(404, "리소스를 찾을 수 없습니다."),
     PAYMENT_PASSWORD_ERROR(404, "결제 비밀번호가 일치하지 않습니다. 다시 입력해주세요."),
+    PAYMENT_GROUP_NOT_FOUND(404, "존재하지 않는 결제 정보입니다."),
     REFUND_ERROR(404, "환불 오류가 발생하였습니다."),
     PAYMENT_PASSWORD_TOKEN_NOT_FOUND(404,
         "PaymentPasswordToken이 유효하지 않습니다. 결제 비밀번호 인증과정을 다시 수행해주세요."),
