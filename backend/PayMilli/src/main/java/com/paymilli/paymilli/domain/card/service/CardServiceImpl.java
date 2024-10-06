@@ -121,7 +121,7 @@ public class CardServiceImpl implements CardService {
     public void changeMainCard(UUID cardId, UUID memberId) {
         Member member = memberRepository.findById(memberId).orElseThrow(()-> new BaseException(BaseResponseStatus.MEMBER_NOT_FOUND));
 
-        Card card = cardRepository.findByIdAndMemberId(cardId, memberId).orElseThrow(()-> new BaseException(BaseResponseStatus.CARD_NOT_FOUND));
+        Card card = cardRepository.findByIdAndMemberIdAndDeleted(cardId, memberId,false).orElseThrow(()-> new BaseException(BaseResponseStatus.CARD_NOT_FOUND));
 
         if(member.getMainCard().getId().equals(card.getId())){
             throw new BaseException(BaseResponseStatus.ALREADY_MAIN_CARD);
