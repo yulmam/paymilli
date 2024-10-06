@@ -50,8 +50,8 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleException(ClientException e) {
         char code = e.getCode().charAt(0);//에러 내용을 분류하는 메인 character
         ErrorResponse errorResponse = ErrorResponse.builder()
-            .errorCode(e.getCode())
-            .errorMessage(e.getMessage())
+            .code(e.getCode())
+            .message(e.getMessage())
             .build();
         if(code == 'A' || code == 'E')
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);

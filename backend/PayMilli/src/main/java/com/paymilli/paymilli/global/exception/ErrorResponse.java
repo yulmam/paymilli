@@ -7,12 +7,12 @@ import lombok.Getter;
 @Builder
 public class ErrorResponse {
 
-    private final String errorCode;
-    private final String errorMessage;
+    private final String code;
+    private final String message;
 
-    public ErrorResponse(String errorCode, String errorMessage) {
-        this.errorCode = errorCode;
-        this.errorMessage = errorMessage;
+    public ErrorResponse(String code, String message) {
+        this.code = code;
+        this.message = message;
     }
 }
 
