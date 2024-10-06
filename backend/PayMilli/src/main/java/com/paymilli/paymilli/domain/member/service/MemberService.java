@@ -121,7 +121,7 @@ public class MemberService {
             authentication = authenticationManagerBuilder.getObject()
                 .authenticate(token);
         } catch (Exception e) {
-            throw new BaseException(BaseResponseStatus.MEMBER_NOT_FOUND);
+            throw new BaseException(BaseResponseStatus.LOGIN_ERROR);
         }
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
