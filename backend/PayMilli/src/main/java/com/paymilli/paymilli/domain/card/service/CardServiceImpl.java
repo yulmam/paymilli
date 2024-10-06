@@ -74,7 +74,7 @@ public class CardServiceImpl implements CardService {
 
     @Transactional
     public CardListResponse searchCards(UUID memberId) {
-        List<Card> cards = cardRepository.findByMemberId(memberId);
+        List<Card> cards = cardRepository.findByMemberIdAndDeleted(memberId, false);
         if(cards.isEmpty())
             return new CardListResponse();
 
