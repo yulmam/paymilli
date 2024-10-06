@@ -108,7 +108,9 @@ public class PaymentServiceImpl implements PaymentService {
         DemandPaymentRequest data = (DemandPaymentRequest) redisUtil.getDataFromRedis(
             transactionId);
 
-        log.info(data.toString());
+        if (data == null) {
+            throw new BaseException(BaseResponseStatus.TRANSACTION_UNAUTHORIZED);
+        }
 
         redisUtil.removeDataFromRedis(transactionId);
 
@@ -182,7 +184,15 @@ public class PaymentServiceImpl implements PaymentService {
     @Transactional
     @Override
     public PaymentGroupResponse getPaymentGroup(String paymentGroupId) {
-        PaymentGroup paymentGroup = paymentGroupRepository.findById(UUID.fromString(paymentGroupId))
+        UUID paymentGroupUUID = null;
+
+        try {
+            paymentGroupUUID = UUID.fromString(paymentGroupId);
+        } catch (Exception e) {
+            throw new BaseException(BaseResponseStatus.PAYMENT_GROUP_NOT_FOUND);
+        }
+
+        PaymentGroup paymentGroup = paymentGroupRepository.findById(paymentGroupUUID)
             .orElseThrow(() -> new BaseException(BaseResponseStatus.PAYMENT_GROUP_NOT_FOUND));
 
         return paymentGroup.makeResponse();
@@ -192,12 +202,18 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public boolean refundPayment(RefundPaymentRequest refundPaymentRequest) {
         log.info("uuid: " + refundPaymentRequest.getRefundToken());
+        UUID paymentGroupId = null;
 
-        UUID paymentGroupId = UUID.fromString((String) redisUtil.getDataFromRedis(
-            refundPaymentRequest.getRefundToken()));
+        try {
+            paymentGroupId = UUID.fromString((String) redisUtil.getDataFromRedis(
+                refundPaymentRequest.getRefundToken()));
+        } catch (Exception e) {
+            throw new BaseException(BaseResponseStatus.REFUND_UNAUTHORIZED);
+        }
 
         PaymentGroup paymentGroup = paymentGroupRepository.findById(
-            paymentGroupId).orElseThrow();
+                paymentGroupId)
+            .orElseThrow(() -> new BaseException(BaseResponseStatus.PAYMENT_GROUP_NOT_FOUND));
 
         return paymentDetailService.refundPaymentGroup(paymentGroup);
     }

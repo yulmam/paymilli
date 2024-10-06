@@ -34,6 +34,7 @@ public enum BaseResponseStatus {
     PAYMENT_ERROR(400, "결제 오류가 발생하였습니다."),
     PAYMENT_REQUEST_ERROR(400, "요청된 결제 정보가 부정확합니다."),
     LOGIN_ERROR(400, "아이디 또는 비밀번호가 일치하지 않습니다."),
+    PAYMENT_PASSWORD_SAME_ERROR(400, "변경하려는 결제 비밀번호가 기존 결제 비밀번호와 동일합니다."),
 
     /**
      * 401 JWT 관련 에러
@@ -41,6 +42,8 @@ public enum BaseResponseStatus {
     REFRESH_TOKEN_NOT_INPUT(401, "refresh token이 입력되지 않았습니다. 다시 입력해주세요."),
     UNAUTHORIZED(401, "access token이 유효하지 않습니다."),
     REFRESH_UNAUTHORIZED(401, "refresh token이 만료되었습니다. 다시 로그인 해주세요."),
+    TRANSACTION_UNAUTHORIZED(401, "transaction ID가 유효하지 않습니다."),
+    REFUND_UNAUTHORIZED(401, "refund token이 유효하지 않습니다."),
 
     /**
      * 404 리소스 못 찾는 에러

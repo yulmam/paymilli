@@ -147,6 +147,11 @@ public class MemberService {
             throw new BaseException(BaseResponseStatus.PAYMENT_PASSWORD_TOKEN_NOT_FOUND);
         }
 
+        if (isEqualPassword(member.getPaymentPassword(),
+            updatePaymentPasswordRequest.getPaymentPassword())) {
+            throw new BaseException(BaseResponseStatus.PAYMENT_PASSWORD_SAME_ERROR);
+        }
+
         member.setPaymentPassword(
             passwordEncoder.encode(updatePaymentPasswordRequest.getPaymentPassword()));
 
