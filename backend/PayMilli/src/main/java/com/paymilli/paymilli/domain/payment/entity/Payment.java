@@ -91,6 +91,7 @@ public class Payment {
             .cardType(card.getCardType())
             .approveNumber(approveNumber)
             .installment(installment)
+            .cardImg(card.getCardImage())
             .build();
     }
 
