@@ -57,7 +57,7 @@ public class CardServiceImpl implements CardService {
         if (cardOpt.isPresent()) {
             Card card = cardOpt.get();
             if (!card.isDeleted()) {
-                throw new BaseException(BaseResponseStatus.CARD_ALREADY_DELETED);
+                throw new BaseException(BaseResponseStatus.CARD_ALREADY_REGISTERED);
             }
             card.create();
             return;

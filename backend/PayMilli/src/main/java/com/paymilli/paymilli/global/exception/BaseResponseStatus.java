@@ -30,6 +30,7 @@ public enum BaseResponseStatus {
     CARD_ALREADY_DELETED(400, "이미 삭제된 카드입니다."),
     CANT_DELETE_MAIN_CARD(400, "메인 카드는 삭제할 수 없습니다."),
     ALREADY_MAIN_CARD(400, "이미 메인카드 입니다."),
+    CARD_ALREADY_REGISTERED(400, "이미 등록된 카드입니다"),
     INVALID_USER_JOIN(400, "동일 이메일 혹은 동일 아이디로 가입된 사용자가 있습니다."),
     PAYMENT_ERROR(400, "결제 오류가 발생하였습니다."),
     PAYMENT_REQUEST_ERROR(400, "요청된 결제 정보가 부정확합니다."),
