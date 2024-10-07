@@ -36,16 +36,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(CardException.class)
     public ResponseEntity<BaseResponse<ErrorCardResponse>> handleCardException(CardException e) {
 
-        String clientMsg = String.valueOf(PayErrorType.of(e.getExcep().getCode()));
+        BaseResponseStatus status = PayErrorType.of(e.getExcep().getCode());
 
         ErrorCardResponse response = ErrorCardResponse.builder()
             .cardName(e.getCardName())
             .cardNumber(e.getCardLastNumber())
-            .cause(clientMsg)
+            .cause(status.getMessage())
             .build();
 
-        return new ResponseEntity<>(new BaseResponse<>(BaseResponseStatus.PAYMENT_ERROR, response),
-            HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new BaseResponse<>(status, response),
+            HttpStatus.PAYMENT_REQUIRED);
     }
 
     //webclient발생시 에러 핸들링
