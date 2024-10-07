@@ -27,16 +27,13 @@ public enum BaseResponseStatus {
     /**
      * 400 잘못된 요청이 왔을 때, Query Parameter나 Request Body가 잘못 왔을 때
      */
-    CARD_ALREADY_DELETED(400, "이미 삭제된 카드입니다."),
-    CANT_DELETE_MAIN_CARD(400, "메인 카드는 삭제할 수 없습니다."),
-    ALREADY_MAIN_CARD(400, "이미 메인카드 입니다."),
-    INVALID_USER_JOIN(400, "동일 이메일 혹은 동일 아이디로 가입된 사용자가 있습니다."),
-    PAYMENT_ERROR(400, "결제 오류가 발생하였습니다."),
+
     PAYMENT_REQUEST_ERROR(400, "요청된 결제 정보가 부정확합니다."),
     LOGIN_ERROR(400, "아이디 또는 비밀번호가 일치하지 않습니다."),
-    PAYMENT_PASSWORD_SAME_ERROR(400, "변경하려는 결제 비밀번호가 기존 결제 비밀번호와 동일합니다."),
     ADD_MEMBER_INVALID(400, "입력된 id 또는 비밀번호가 기준에 적합하지 않습니다."),
     PAYMENT_PRICE_INVALID(400, "입력된 가격이 적합하지 않습니다."),
+    PAYMENT_PASSWORD_SAME_ERROR(400, "변경하려는 결제 비밀번호가 기존 결제 비밀번호와 동일합니다."),
+
 
     /**
      * 401 JWT 관련 에러
@@ -51,6 +48,7 @@ public enum BaseResponseStatus {
     EXCEEDED_ONE_TIME(402, "1회 결제 한도를 초과하였습니다."),
     EXCEEDED_ONE_DAY(402, "1일 결제 한도를 초과하였습니다."),
 
+    CANT_DELETE_MAIN_CARD(403, "메인 카드는 삭제할 수 없습니다."),
 
     /**
      * 404 리소스 못 찾는 에러
@@ -69,6 +67,10 @@ public enum BaseResponseStatus {
      * 이미 존재하는 데이터
      */
     MEMBER_ALREADY_EXIST(409, "이미 가입되어 있는 사용자 입니다."),
+    INVALID_USER_JOIN(409, "동일 이메일 혹은 동일 아이디로 가입된 사용자가 있습니다."),
+    PAYMENT_ERROR(409, "결제 오류가 발생하였습니다."),
+    CARD_ALREADY_DELETED(409, "이미 삭제된 카드입니다."),
+    ALREADY_MAIN_CARD(409, "이미 메인카드 입니다."),
 
     /**
      * 인프라 에러
