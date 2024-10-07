@@ -36,6 +36,7 @@ public enum BaseResponseStatus {
     LOGIN_ERROR(400, "아이디 또는 비밀번호가 일치하지 않습니다."),
     PAYMENT_PASSWORD_SAME_ERROR(400, "변경하려는 결제 비밀번호가 기존 결제 비밀번호와 동일합니다."),
     ADD_MEMBER_INVALID(400, "입력된 id 또는 비밀번호가 기준에 적합하지 않습니다."),
+    PAYMENT_PRICE_INVALID(400, "입력된 가격이 적합하지 않습니다."),
 
     /**
      * 401 JWT 관련 에러

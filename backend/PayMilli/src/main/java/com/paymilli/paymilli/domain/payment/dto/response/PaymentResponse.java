@@ -9,6 +9,7 @@ public class PaymentResponse {
 
     private String cardId;
     private String cardName;
+    private int installment;
     private int chargePrice;
     private String approveNumber;
 }

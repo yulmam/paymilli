@@ -89,6 +89,7 @@ public class Payment {
             .cardName(card.getCardName())
             .chargePrice(price)
             .approveNumber(approveNumber)
+            .installment(installment)
             .build();
     }
 
