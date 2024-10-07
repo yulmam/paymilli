@@ -15,6 +15,7 @@ import com.paymilli.paymilli.global.exception.BaseResponse;
 import com.paymilli.paymilli.global.exception.BaseResponseStatus;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -43,8 +44,7 @@ public class MemberController {
 
     @PostMapping("/join")
     public ResponseEntity<BaseResponse<Void>> addMember(
-        @RequestBody AddMemberRequest addMemberRequest) {
-
+        @RequestBody @Valid AddMemberRequest addMemberRequest) {
         memberService.addMember(addMemberRequest);
 
         return ResponseEntity.ok(new BaseResponse<>(BaseResponseStatus.SUCCESS_MEMBER_CREATED));

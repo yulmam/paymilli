@@ -8,42 +8,45 @@ import com.paymilli.paymilli.global.exception.BaseResponse;
 import com.paymilli.paymilli.global.exception.BaseResponseStatus;
 import com.paymilli.paymilli.global.exception.ClientException;
 import com.paymilli.paymilli.global.exception.ErrorResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
-
-import lombok.extern.slf4j.Slf4j;
 
 @RestControllerAdvice
 @Slf4j
 public class GlobalExceptionHandler {
-	@ExceptionHandler(BaseException.class)
-	public ResponseEntity<BaseResponse<BaseException>> handleBaseException(BaseException e) {
-		e.printStackTrace();
-		log.info("[error handler requestId {}, status: {}, message: {}]", MDC.get("requestId"), e.getStatus(),
-			e.getMessage());
-		return ResponseEntity
-			.status(HttpStatusCode.valueOf(e.getStatus().getCode()))
-			.body(new BaseResponse<>(e.getStatus()));
-	}
 
-	// 결제 오류시 발생
-	@ExceptionHandler(CardException.class)
-	public ResponseEntity<BaseResponse<ErrorCardResponse>> handleCardException(CardException e) {
+    @ExceptionHandler(BaseException.class)
+    public ResponseEntity<BaseResponse<BaseException>> handleBaseException(BaseException e) {
+        e.printStackTrace();
+        log.info("[error handler requestId {}, status: {}, message: {}]", MDC.get("requestId"),
+            e.getStatus(),
+            e.getMessage());
+        return ResponseEntity
+            .status(HttpStatusCode.valueOf(e.getStatus().getCode()))
+            .body(new BaseResponse<>(e.getStatus()));
+    }
 
-		String clientMsg = String.valueOf(PayErrorType.of(e.getExcep().getCode()));
+    // 결제 오류시 발생
+    @ExceptionHandler(CardException.class)
+    public ResponseEntity<BaseResponse<ErrorCardResponse>> handleCardException(CardException e) {
 
-		ErrorCardResponse response = ErrorCardResponse.builder()
-			.cardName(e.getCardName())
-			.cardNumber(e.getCardLastNumber())
-			.cause(clientMsg)
-			.build();
+        String clientMsg = String.valueOf(PayErrorType.of(e.getExcep().getCode()));
 
-		return new ResponseEntity<>(new BaseResponse<>(BaseResponseStatus.PAYMENT_ERROR, response), HttpStatus.BAD_REQUEST);
-	}
+        ErrorCardResponse response = ErrorCardResponse.builder()
+            .cardName(e.getCardName())
+            .cardNumber(e.getCardLastNumber())
+            .cause(clientMsg)
+            .build();
+
+        return new ResponseEntity<>(new BaseResponse<>(BaseResponseStatus.PAYMENT_ERROR, response),
+            HttpStatus.BAD_REQUEST);
+    }
 
     //webclient발생시 에러 핸들링
     @ExceptionHandler(ClientException.class)
@@ -53,21 +56,35 @@ public class GlobalExceptionHandler {
             .code(e.getCode())
             .message(e.getMessage())
             .build();
-        if(code == 'A' || code == 'E')
+        if (code == 'A' || code == 'E') {
             return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+        }
 
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
-	// BaseException으로 정의하지 않은 runtime exception
-	@ExceptionHandler(Exception.class)
-	public ResponseEntity<BaseResponse<BaseException>> handleException(Exception e) {
-		e.printStackTrace();
-		log.info("[error handler requestId {}, status: {}, message: {}]", MDC.get("requestId"), "status",
-			e.getMessage());
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<BaseResponse<BaseException>> handleValidException(Exception e) {
+        e.printStackTrace();
+        log.info("[error handler requestId {}, status: {}, message: {}]", MDC.get("requestId"),
+            "status",
+            e.getMessage());
 
-		return ResponseEntity
-			.status(HttpStatusCode.valueOf(500))
-			.body(new BaseResponse<>(BaseResponseStatus.SERVER_ERROR));
-	}
+        return ResponseEntity
+            .status(HttpStatusCode.valueOf(400))
+            .body(new BaseResponse<>(BaseResponseStatus.ADD_MEMBER_INVALID));
+    }
+
+    // BaseException으로 정의하지 않은 runtime exception
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<BaseResponse<BaseException>> handleException(Exception e) {
+        e.printStackTrace();
+        log.info("[error handler requestId {}, status: {}, message: {}]", MDC.get("requestId"),
+            "status",
+            e.getMessage());
+
+        return ResponseEntity
+            .status(HttpStatusCode.valueOf(500))
+            .body(new BaseResponse<>(BaseResponseStatus.SERVER_ERROR));
+    }
 }
