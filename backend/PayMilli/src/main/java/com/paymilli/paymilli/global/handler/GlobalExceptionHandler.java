@@ -52,16 +52,21 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(ClientException.class)
     public ResponseEntity<ErrorResponse> handleException(ClientException e) {
         char code = e.getCode().charAt(0);//에러 내용을 분류하는 메인 character
-        ErrorResponse errorResponse = ErrorResponse.builder()
-            .code(e.getCode())
-            .message(e.getMessage())
-            .build();
         if (code == 'A' || code == 'E') {
-            return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
+            ErrorResponse errorResponse = ErrorResponse.builder()
+                .code(403)
+                .message(e.getMessage())
+                .build();
+            return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
         }
 
+        ErrorResponse errorResponse = ErrorResponse.builder()
+            .code(500)
+            .message(e.getMessage())
+            .build();
         return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
     }
+
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<BaseResponse<BaseException>> handleValidException(Exception e) {
