@@ -47,6 +47,11 @@ public enum BaseResponseStatus {
     TRANSACTION_UNAUTHORIZED(401, "transaction ID가 유효하지 않습니다."),
     REFUND_UNAUTHORIZED(401, "refund token이 유효하지 않습니다."),
 
+    LACK_OF_BALANCE(402, "잔액이 부족합니다."),
+    EXCEEDED_ONE_TIME(402, "1회 결제 한도를 초과하였습니다."),
+    EXCEEDED_ONE_DAY(402, "1일 결제 한도를 초과하였습니다."),
+
+
     /**
      * 404 리소스 못 찾는 에러
      */
