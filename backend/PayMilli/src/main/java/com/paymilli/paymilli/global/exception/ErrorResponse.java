@@ -7,10 +7,10 @@ import lombok.Getter;
 @Builder
 public class ErrorResponse {
 
-    private final String code;
+    private final int code;
     private final String message;
 
-    public ErrorResponse(String code, String message) {
+    public ErrorResponse(int code, String message) {
         this.code = code;
         this.message = message;
     }
