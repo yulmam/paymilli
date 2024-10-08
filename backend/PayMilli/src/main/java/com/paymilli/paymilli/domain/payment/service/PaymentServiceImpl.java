@@ -84,7 +84,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         String transactionId = memberId + "-" + randomNumber;
 
-        redisUtil.saveDataToRedis(transactionId, demandPaymentRequest, 86400 * 1000);
+        redisUtil.saveDataToRedis(transactionId, demandPaymentRequest, 1200 * 1000);
 
         return new DemandResponse(transactionId);
     }
@@ -111,8 +111,6 @@ public class PaymentServiceImpl implements PaymentService {
         if (data == null) {
             throw new BaseException(BaseResponseStatus.TRANSACTION_UNAUTHORIZED);
         }
-
-        redisUtil.removeDataFromRedis(transactionId);
 
         PaymentGroup paymentGroup = PaymentGroup.toEntity(data);
 
