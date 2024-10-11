@@ -5,10 +5,10 @@ Pay-milli는 SSAFY A702 팀 프로젝트로 개발된 온라인 분할 결제 �
 
 ### 팀 구성원
 신권일 (Backend)
-김한얼 (Frontend)
+김한얼 (Backend)
 이태현 (Backend)
 유수빈 (Frontend)
-유성주 (Backend)
+유성주 (Frontend)
 김효준 (Frontend)
 
 
