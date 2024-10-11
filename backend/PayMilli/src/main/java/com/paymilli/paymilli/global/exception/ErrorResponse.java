@@ -1,15 +1,18 @@
 package com.paymilli.paymilli.global.exception;
 
+import lombok.Builder;
 import lombok.Getter;
 
 @Getter
+@Builder
 public class ErrorResponse {
 
-    private final String errorCode;
-    private final String errorMessage;
+    private final int code;
+    private final String message;
 
-    public ErrorResponse(String errorCode, String errorMessage) {
-        this.errorCode = errorCode;
-        this.errorMessage = errorMessage;
+    public ErrorResponse(int code, String message) {
+        this.code = code;
+        this.message = message;
     }
 }
+

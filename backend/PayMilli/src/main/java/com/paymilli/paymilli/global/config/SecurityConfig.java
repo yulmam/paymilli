@@ -1,7 +1,8 @@
-package com.paymilli.paymilli.config;
+package com.paymilli.paymilli.global.config;
 
 import com.paymilli.paymilli.domain.member.jwt.JwtAccessDeniedHandler;
 import com.paymilli.paymilli.domain.member.jwt.JwtAuthenticationEntryPoint;
+import com.paymilli.paymilli.domain.member.jwt.JwtExceptionFilter;
 import com.paymilli.paymilli.domain.member.jwt.JwtFilter;
 import com.paymilli.paymilli.domain.member.jwt.TokenProvider;
 import lombok.RequiredArgsConstructor;
@@ -38,6 +39,7 @@ public class SecurityConfig {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 
             .authorizeHttpRequests(request -> request
+                .requestMatchers("/member/check").permitAll()
                 .requestMatchers("/member/join").permitAll()
                 .requestMatchers("/member/login").permitAll()
                 .requestMatchers("/member/refresh").permitAll()
@@ -51,8 +53,11 @@ public class SecurityConfig {
                 .requestMatchers("/error").permitAll()
                 .anyRequest().authenticated())
 
+            .addFilterBefore(new JwtExceptionFilter(tokenProvider),
+                UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(new JwtFilter(tokenProvider),
                 UsernamePasswordAuthenticationFilter.class)
+
         ;
 
         return http.build();

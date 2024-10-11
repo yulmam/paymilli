@@ -10,7 +10,11 @@ public interface CardRepository extends JpaRepository<Card, UUID> {
 
     Optional<Card> findByCardNumberAndMemberId(String cardNumber, UUID memberId);
 
-    List<Card> findByMemberId(UUID memberId);
+    List<Card> findByMemberIdAndDeleted(UUID memberId, boolean deleted);
 
     void deleteByIdAndMemberId(UUID cardId, UUID memberId);
+
+    Optional<Card> findByIdAndMemberIdAndDeleted(UUID id, UUID memberId, boolean deleted);
+
+    Optional<Card> findByIdAndMemberId(UUID id, UUID memberId);
 }

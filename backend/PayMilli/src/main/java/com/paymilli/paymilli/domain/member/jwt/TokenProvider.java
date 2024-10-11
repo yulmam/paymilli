@@ -1,7 +1,10 @@
 package com.paymilli.paymilli.domain.member.jwt;
 
-import com.paymilli.paymilli.global.exception.TokenExpiredException;
-import com.paymilli.paymilli.global.exception.TokenInvalidException;
+import com.paymilli.paymilli.domain.member.entity.Member;
+import com.paymilli.paymilli.domain.member.repository.MemberRepository;
+import com.paymilli.paymilli.global.exception.BaseException;
+import com.paymilli.paymilli.global.exception.BaseResponseStatus;
+import com.paymilli.paymilli.global.util.RedisUtil;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -14,10 +17,12 @@ import java.security.Key;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.UUID;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -33,16 +38,23 @@ public class TokenProvider implements InitializingBean {
     private final String secret;
     private final long accessTokenValidityInMilliseconds;
     private final long refreshTokenValidityInMilliseconds;
+    private final RedisUtil redisUtil;
+    private final MemberRepository memberRepository;
+    //    private final RedisTemplate<String, String> redisTemplate;
     private Key key;
 
     public TokenProvider(
         @Value("${jwt.secret}") String secret,
-        @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds) {
+        @Value("${jwt.token-validity-in-seconds}") long tokenValidityInSeconds,
+        RedisTemplate<String, String> redisTemplate, RedisUtil redisUtil,
+        MemberRepository memberRepository) {
         this.secret = secret;
-        this.accessTokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
+        this.accessTokenValidityInMilliseconds = 86400 * 1000;
 //        this.accessTokenValidityInMilliseconds = 10;
         this.refreshTokenValidityInMilliseconds = tokenValidityInSeconds * 1000;
+        this.redisUtil = redisUtil;
 //        this.refreshTokenValidityInMilliseconds = 10;
+        this.memberRepository = memberRepository;
     }
 
     @Override
@@ -61,12 +73,19 @@ public class TokenProvider implements InitializingBean {
         long now = (new Date()).getTime();
         Date validity = new Date(now + this.refreshTokenValidityInMilliseconds);
 
-        return Jwts.builder()
-            .setSubject(authentication.getName())
+        UUID id = getUUID(authentication);
+
+        String refreshToken = Jwts.builder()
+            .setSubject(id.toString())
             .claim(AUTHORITIES_KEY, authorities)
             .signWith(key, SignatureAlgorithm.HS512)
             .setExpiration(validity)
             .compact();
+
+        redisUtil.saveDataToRedis(id.toString(), refreshToken,
+            refreshTokenValidityInMilliseconds);
+
+        return refreshToken;
     }
 
     public String createAccessToken(Authentication authentication) {
@@ -79,12 +98,41 @@ public class TokenProvider implements InitializingBean {
         long now = (new Date()).getTime();
         Date validity = new Date(now + this.accessTokenValidityInMilliseconds);
 
+        UUID id = getUUID(authentication);
+
         return Jwts.builder()
-            .setSubject(authentication.getName())
+            .setSubject(id.toString())
             .claim(AUTHORITIES_KEY, authorities)
             .signWith(key, SignatureAlgorithm.HS512)
             .setExpiration(validity)
             .compact();
+    }
+
+    public String createAccessToken(Authentication authentication, String refreshToken) {
+        String authorities = authentication.getAuthorities().stream()
+            .map(GrantedAuthority::getAuthority)
+            .collect(Collectors.joining(","));
+
+        long now = (new Date()).getTime();
+        Date validity = new Date(now + this.accessTokenValidityInMilliseconds);
+
+        UUID id = getId(refreshToken);
+
+        return Jwts.builder()
+            .setSubject(id.toString())
+            .claim(AUTHORITIES_KEY, authorities)
+            .signWith(key, SignatureAlgorithm.HS512)
+            .setExpiration(validity)
+            .compact();
+    }
+
+    private UUID getUUID(Authentication authentication) {
+        String memberID = authentication.getName();
+
+        System.out.println(memberID);
+
+        Member member = memberRepository.findByMemberId(memberID).orElseThrow();
+        return member.getId();
     }
 
     public Authentication getAuthentication(String token) {
@@ -105,6 +153,12 @@ public class TokenProvider implements InitializingBean {
 
         log.info("authorities: {}", authorities);
 
+        System.out.println("subject: " + claims.getSubject());
+        System.out.println("issuer: " + claims.getIssuer());
+        System.out.println("audience: " + claims.getAudience());
+        System.out.println("expiration: " + claims.getExpiration());
+        System.out.println("id: " + claims.getId());
+
         // 권한 정보를 이용해서 User 객체를 만듬
         User principal = new User(claims.getSubject(), "", authorities);
 
@@ -117,29 +171,38 @@ public class TokenProvider implements InitializingBean {
             return true;
         } catch (ExpiredJwtException e) {
             log.info("만료된 JWT 토큰입니다.");
-            throw new TokenExpiredException("JWT 토큰이 만료되었습니다.");
+            throw new BaseException(BaseResponseStatus.UNAUTHORIZED);
         } catch (io.jsonwebtoken.security.SecurityException | MalformedJwtException e) {
             log.info("잘못된 JWT 서명입니다.");
-            throw new TokenInvalidException("잘못된 JWT 서명입니다.");
+            throw new BaseException(BaseResponseStatus.UNAUTHORIZED);
         } catch (UnsupportedJwtException e) {
             log.info("지원되지 않는 JWT 토큰입니다.");
-            throw new TokenInvalidException("지원되지 않는 JWT 토큰입니다.");
+            throw new BaseException(BaseResponseStatus.UNAUTHORIZED);
         } catch (IllegalArgumentException e) {
             log.info("JWT 토큰이 잘못되었습니다.");
-            throw new TokenInvalidException("JWT 토큰이 잘못되었습니다.");
+            throw new BaseException(BaseResponseStatus.UNAUTHORIZED);
         }
     }
 
-    public String getMemberId(String token) {
-        return Jwts.parserBuilder()
+    public UUID getId(String token) {
+        return UUID.fromString(Jwts.parserBuilder()
             .setSigningKey(key) // 동일한 키 사용
             .build()
             .parseClaimsJws(token)
             .getBody()
-            .getSubject(); // 토큰의 subject에서 memberId 추출
+            .getSubject()); // 토큰의 subject에서 memberId 추출
     }
 
     public String extractAccessToken(String token) {
         return token.split(" ")[1];
+    }
+
+
+    public String getRefreshToken(String refreshToken) {
+        return (String) redisUtil.getDataFromRedis(refreshToken);
+    }
+
+    public void removeRefreshToken(UUID memberId) {
+        redisUtil.removeDataFromRedis(memberId.toString());
     }
 }

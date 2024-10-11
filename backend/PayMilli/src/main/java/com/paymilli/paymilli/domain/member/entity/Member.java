@@ -1,18 +1,25 @@
 package com.paymilli.paymilli.domain.member.entity;
 
+import com.paymilli.paymilli.domain.card.entity.Card;
 import com.paymilli.paymilli.domain.member.dto.request.AddMemberRequest;
 import com.paymilli.paymilli.domain.member.dto.response.MemberInfoResponse;
+import com.paymilli.paymilli.domain.payment.entity.PaymentGroup;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Temporal;
 import jakarta.persistence.TemporalType;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,16 +39,14 @@ public class Member {
 
     @Id
     @GeneratedValue
-    @Column
+    @Column(columnDefinition = "BINARY(16)")
     private UUID id;
 
-//    card 개발시 제거 예정
-//    @OneToMany(mappedBy = "member")
-//    private List<Card> cards=new ArrayList<Card>();
+    @OneToMany(mappedBy = "member")
+    private List<Card> cards = new ArrayList<Card>();
 
-//    paymentGroup 개발시 제거 예정
-//    @OneToMany(mappedBy = "member")
-//    private List<PaymentGroup> paymentGroups=new ArrayList<PaymentGroup>();
+    @OneToMany(mappedBy = "member")
+    private List<PaymentGroup> paymentGroups = new ArrayList<PaymentGroup>();
 
     @Column(nullable = false)
     private String memberId;
@@ -73,13 +78,10 @@ public class Member {
     @Column(nullable = false)
     private String phone;
 
-    @Column
-    private String refreshToken;
-
-//    card 개발시 제거 예정
-//    @OneToOne
-//    @Column
-//    private Card mainCard;
+    //    card 개발시 제거 예정
+    @OneToOne
+    @JoinColumn(name = "main_card_id")
+    private Card mainCard;
 
     @Column
     @CreationTimestamp
@@ -94,22 +96,8 @@ public class Member {
     @ColumnDefault("false")
     private boolean deleted;
 
-//    card 개발시 제거 예정
-//    연관관계 편의 메서드
-//    public void addCard(Card card){
-//        cards.add(card);
-//        card.setMember(this);
-//    }
-
-//    paymentGroup 개발시 제거 예정
-//    연관관계 편의 메서드
-//    public void addPaymentGroup(PaymentGroup paymentGroup){
-//        paymentGroups.add(paymentGroup);
-//        paymentGroup.setMember(this);
-//    }
-
     public static Member toEntity(AddMemberRequest addMemberRequest, String userKey,
-        LocalDate birthday, String encodePassword, String encodePaymentPassword) {
+        LocalDate birthday, String encodePassword, String encodePaymentPassword, String email) {
         return Member.builder()
             .memberId(addMemberRequest.getMemberId())
             .password(encodePassword)
@@ -119,9 +107,38 @@ public class Member {
             .role(Role.USER)
             .paymentPassword(encodePaymentPassword)
             .userKey(userKey)
-            .email(addMemberRequest.getEmail())
+            .email(email)
             .phone(addMemberRequest.getPhone())
             .build();
+    }
+
+    //    연관관계 편의 메서드
+    public void addCard(Card card) {
+        cards.add(card);
+        card.setMember(this);
+    }
+
+    //    연관관계 편의 메서드
+    public void addPaymentGroup(PaymentGroup paymentGroup) {
+        paymentGroups.add(paymentGroup);
+        paymentGroup.setMember(this);
+    }
+
+    public void setPaymentPassword(String paymentPassword) {
+        this.paymentPassword = paymentPassword;
+    }
+
+    public void setMainCard(Card mainCard) {
+        this.mainCard = mainCard;
+    }
+
+    public void delete() {
+        deleted = true;
+        mainCard = null;
+    }
+
+    public void create() {
+        deleted = false;
     }
 
     public MemberInfoResponse makeResponse() {
@@ -134,11 +151,13 @@ public class Member {
             .build();
     }
 
-    public void setRefreshToken(String refreshToken) {
-        this.refreshToken = refreshToken;
-    }
-
-    public void setPaymentPassword(String paymentPassword) {
-        this.paymentPassword = paymentPassword;
+    public void update(AddMemberRequest addMemberRequest, String encodePassword,
+        String encodePaymentPassword, LocalDate birthday) {
+        name = addMemberRequest.getName();
+        password = encodePassword;
+        this.birthday = birthday;
+        gender = addMemberRequest.getGender();
+        phone = addMemberRequest.getPhone();
+        paymentPassword = encodePaymentPassword;
     }
 }
