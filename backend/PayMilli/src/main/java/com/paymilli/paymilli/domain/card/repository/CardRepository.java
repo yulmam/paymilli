@@ -1,16 +1,20 @@
 package com.paymilli.paymilli.domain.card.repository;
 
 import com.paymilli.paymilli.domain.card.entity.Card;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface CardRepository extends JpaRepository<Card, UUID> {
-    Optional<Card> findByCardNumberAndUserId(String cardNumber, UUID userId);
 
-    List<Card> findByUserId(UUID userId);
+    Optional<Card> findByCardNumberAndMemberId(String cardNumber, UUID memberId);
 
-    void deleteByIdAndUserId(UUID cardId, UUID userId);
+    List<Card> findByMemberIdAndDeleted(UUID memberId, boolean deleted);
+
+    void deleteByIdAndMemberId(UUID cardId, UUID memberId);
+
+    Optional<Card> findByIdAndMemberIdAndDeleted(UUID id, UUID memberId, boolean deleted);
+
+    Optional<Card> findByIdAndMemberId(UUID id, UUID memberId);
 }

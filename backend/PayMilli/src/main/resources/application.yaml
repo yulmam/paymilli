@@ -1,22 +1,3 @@
 spring:
-  application:
-    name: PayMilli
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://root_db_1:3306/exampledb?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
-    username: user
-    password: 1234
-  #  jackson:
-  #    serialization:
-  #      fail-on-empty-beans: false
-  jpa:
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
-        #        dialect: org.hibernate.spatial.dialect.mysql.MySQL8SpatialDialect
-        globally_quoted_identifiers: true
-        format_sql: true
-        show_sql: true
-    hibernate:
-      ddl-auto: update
-    open-in-view: true
+  profiles:
+    active: prod
