@@ -1,0 +1,27 @@
+server:
+  servlet:
+    context-path: /api/v1/cardcompany
+
+spring:
+  config:
+    import: optional:file:.env[.properties]
+  application:
+    name: PayMilli
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/cardserver?useSSL=false&useUnicode=true&serverTimezone=Asia/Seoul&allowPublicKeyRetrieval=true
+    username: root
+    password: root
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+        #        dialect: org.hibernate.spatial.dialect.mysql.MySQL8SpatialDialect
+        globally_quoted_identifiers: true
+        format_sql: true
+        show_sql: true
+    hibernate:
+      ddl-auto: create
+    open-in-view: true
+ssafy:
+  apikey: 8cdca4197e95472e9e2947dedeaf6f72
